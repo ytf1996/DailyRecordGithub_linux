@@ -1,0 +1,9 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model TerritoryProfiles
+
+@{
+    var htmlStr = BusinessHelper.BuildCreateOrEditPage<TerritoryProfiles>(Model, "6");
+}
+
+@htmlStr

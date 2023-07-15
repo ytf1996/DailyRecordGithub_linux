@@ -1,0 +1,557 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model List<Purview>
+
+@{
+    var listEntityModels = BusinessHelper.ListEntityModels.Where(x => x.OnlyForAdmin == false).OrderBy(x => x.OrderNum).ToList();
+    TerritoryProfiles modelTerritoryProfiles = ViewBag.modelTerritoryProfiles as TerritoryProfiles;
+    string TerritoryProfilesName = modelTerritoryProfiles == null ? "" : string.Format("{0}:{1}", modelTerritoryProfiles.Name, modelTerritoryProfiles.Id);
+    var listTerritory = BusinessHelper.ListTerritoryForSelect;
+    CommonBusiness bbnt = new CommonBusiness();
+    Users currentUser = bbnt.GetCurrentUserInfo();
+    string territoryProfilesId = AppContextMy.Current.Request.Query["territoryProfilesId"];
+    IEnumerable<int?> otherTerritorys = null;
+    if (Model != null)
+    {
+        otherTerritorys = Model.Where(m => m.PurviewType == PurviewType.OtherTerritory).Select(m => m.OtherTerritoryId).Distinct();
+    }
+
+    BusinessTerritory businessTerritory = new BusinessTerritory();
+
+    string templet = @"<div role='tabpanel' class='tab-pane' id='otherTerritoryTab__Id__'>
+<div class='card'>
+<div class='row'>
+<div class='col-lg-12'>
+<div class='well bs-component'>
+<fieldset>
+<legend>权限配置(" + TerritoryProfilesName + ")-其它区域(__Name__:__Id__)</legend>";
+
+    for (int i = 0; i < listEntityModels.Count; i++)
+    {
+        templet += @"<div class='row'>
+<div class='col-md-2 col-xs-2'>" + @listEntityModels[i].DisplayName;
+
+        templet += @"<input type='hidden' name='Id' value='0' />
+<input type='hidden' name='CreatedById' value='" + currentUser.Id + @"' />
+<input type='hidden' name='CreatedDate' value='" + DateTime.Now + "' />";
+
+        templet += @"<input type='hidden' name='FullName' value='" + listEntityModels[i].FullName + @"' />
+<input type='hidden' name='PurviewType' value='OtherTerritory' />
+<input type='hidden' name='TerritoryProfilesId' value='" + territoryProfilesId + @"' />
+<input type='hidden' name='OtherTerritoryId' value='__Id__' />";
+        templet += @" </div>
+<div class='col-md-2 col-xs-2'>
+<div class='toggle'>
+<label>
+<input type='checkbox' class='CanInsert'
+value='true'>
+<span class='button-indecator'>新增</span>
+</label>
+</div>
+</div>
+<div class='col-md-2 col-xs-2'>
+<div class='toggle'>
+<label class='semibold-text'>
+<input type='checkbox' class='CanSelect'
+value='true'>
+<span class='button-indecator'>查看</span>
+</label>
+</div>
+</div>
+<div class='col-md-2 col-xs-2'>
+<div class='toggle'>
+<label class='semibold-text'>
+<input type='checkbox' class='CanUpdate'
+value='true'>
+<span class='button-indecator'>修改</span>
+</label>
+</div>
+</div>
+<div class='col-md-2 col-xs-2'>
+<div class='toggle'>
+<label class='semibold-text'>
+<input type='checkbox' class='CanDelete'
+value='true'>
+<span class='button-indecator'>删除</span>
+</label>
+</div>
+</div>
+</div>
+<hr />";
+
+    }
+
+    templet += @"</fieldset>
+</div>
+</div>
+</div>
+</div>
+</div>";
+
+}
+
+<style>
+    .select2-drop {
+        z-index: 10050 !important;
+    }
+
+    .select2-search-choice-close {
+        margin-top: 0 !important;
+        right: 2px !important;
+        min-height: 10px;
+    }
+
+        .select2-search-choice-close:before {
+            color: black !important;
+        }
+    /*防止select2不会自动失去焦点*/
+    .select2-container {
+        z-index: 16000 !important;
+    }
+
+    .select2-drop-mask {
+        z-index: 15990 !important;
+    }
+
+    .select2-drop-active {
+        z-index: 15995 !important;
+    }
+
+    .closeTab {
+        position: relative;
+        top: -40px;
+        cursor: pointer;
+    }
+
+</style>
+
+<div class="page-title">
+    <div>
+        <h1>权限配置</h1>
+        <ul class="breadcrumb side">
+            <li><a href="/Management/Home/Index"><i class="fa fa-home fa-lg"></i></a></li>
+            <li>管理</li>
+            <li class="active">权限配置</li>
+        </ul>
+    </div>
+    <div>
+        <btn class="btn btn-primary btn-flat" data-toggle="modal" data-target=".bs-example-modal-sm"><i class="fa fa-lg fa-plus"></i></btn>
+    </div>
+</div>
+
+<ul id="tabTitles" class="nav nav-tabs" role="tablist">
+    <li id="myTerritoryTabTitle" role="presentation" class="active tabTitleClass">
+        <a href="#myTerritoryTab" id="myTerritoryTabA" aria-controls="myTerritoryTab" role="tab" data-toggle="tab">用户所在区域</a>
+    </li>
+
+    <li id="ownerTabTitle" role="presentation" class="tabTitleClass">
+        <a href="#ownerTab" id="ownerTabA" aria-controls="ownerTab" role="tab" data-toggle="tab">创建者</a>
+    </li>
+
+    @if (otherTerritorys != null)
+    {
+        foreach (var itemTerrId in otherTerritorys)
+        {
+            var itemTerr = businessTerritory.GetByTerrId(itemTerrId);
+            if (itemTerr != null)
+            {
+                <li id="otherTerritoryTab@(itemTerrId)Title" role="presentation" class="tabTitleClass" territoryIdValue="@itemTerrId">
+                    <a href="#otherTerritoryTab@(itemTerrId)" id="otherTerritoryTab@(itemTerrId)A" aria-controls="otherTerritoryTab@(itemTerrId)"
+                       role="tab" data-toggle="tab">@(itemTerr.Name)</a>
+                    <i class='fa fa-close fa-sm closeTab' onclick='delOtherTerritory(this)'></i>
+                </li>
+            }
+        }
+    }
+</ul>
+<form id="setTerritoryForm" class="form-horizontal" method="post">
+    <div id="tab-content" class="tab-content">
+
+        <div role="tabpanel" class="tab-pane active" id="myTerritoryTab">
+            <div class="card">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="well bs-component">
+                            <fieldset>
+                                <legend>权限配置(@(TerritoryProfilesName))-用户所在区域</legend>
+                                @{
+                                    for (int i = 0; i < listEntityModels.Count; i++)
+                                    {
+                                        Purview modelPur = Model.FirstOrDefault(x => x.FullName == listEntityModels[i].FullName
+                                        && x.PurviewType == PurviewType.MyTerritory);
+                                        <div class="row">
+                                            <div class="col-md-2 col-xs-2">
+                                                @listEntityModels[i].DisplayName
+                                                @{
+                                                    if (modelPur == null)
+                                                    {
+                                                        <input type="hidden" name="Id" value="0" />
+                                                        <input type="hidden" name="CreatedById" value="@currentUser.Id" />
+                                                        <input type="hidden" name="CreatedDate" value="@DateTime.Now" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="hidden" name="Id" value="@modelPur.Id" />
+                                                        <input type="hidden" name="CreatedById" value="@modelPur.CreatedById" />
+                                                        <input type="hidden" name="CreatedDate" value="@modelPur.CreatedDate" />
+                                                    }
+                                                    <input type="hidden" name="FullName" value="@listEntityModels[i].FullName" />
+                                                    <input type="hidden" name="PurviewType" value="MyTerritory" />
+                                                    <input type="hidden" name="TerritoryProfilesId" value="@territoryProfilesId" />
+                                                    <input type="hidden" name="OtherTerritoryId" value="" />
+                                                }
+                                            </div>
+                                            <div class="col-md-2 col-xs-2">
+                                                <div class="toggle">
+                                                    <label>
+                                                        <input type="checkbox" class="CanInsert"
+                                                               value="true"
+                                                               @(modelPur != null && modelPur.CanInsert ? "checked='checked'" : "") />
+                                                        <span class="button-indecator">新增</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-2">
+                                                <div class="toggle">
+                                                    <label>
+                                                        <input type="checkbox" class="CanSelect"
+                                                               value="true"
+                                                               @(modelPur != null && modelPur.CanSelect ? "checked='checked'" : "") />
+                                                        <span class="button-indecator">查看</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-2">
+                                                <div class="toggle">
+                                                    <label>
+                                                        <input type="checkbox" class="CanUpdate"
+                                                               value="true"
+                                                               @(modelPur != null && modelPur.CanUpdate ? "checked='checked'" : "") />
+                                                        <span class="button-indecator">修改</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-2">
+                                                <div class="toggle">
+                                                    <label>
+                                                        <input type="checkbox" class="CanDelete"
+                                                               value="true"
+                                                               @(modelPur != null && modelPur.CanDelete ? "checked='checked'" : "") />
+                                                        <span class="button-indecator">删除</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr />
+                                    }
+                                }
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="ownerTab">
+            <div class="card">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="well bs-component">
+                            <fieldset>
+                                <legend>小组权限配置(@(TerritoryProfilesName))-创建者</legend>
+                                @{
+                                    for (int i = 0; i < listEntityModels.Count; i++)
+                                    {
+                                        Purview modelPur = Model.FirstOrDefault(x => x.FullName == listEntityModels[i].FullName
+                                        && x.PurviewType == PurviewType.Owner);
+                                        <div class="row">
+                                            <div class="col-md-2 col-xs-2">
+                                                @listEntityModels[i].DisplayName
+                                                @{
+                                                    if (modelPur == null)
+                                                    {
+                                                        <input type="hidden" name="Id" value="0" />
+                                                        <input type="hidden" name="CreatedById" value="@currentUser.Id" />
+                                                        <input type="hidden" name="CreatedDate" value="@DateTime.Now" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="hidden" name="Id" value="@modelPur.Id" />
+                                                        <input type="hidden" name="CreatedById" value="@modelPur.CreatedById" />
+                                                        <input type="hidden" name="CreatedDate" value="@modelPur.CreatedDate" />
+                                                    }
+                                                    <input type="hidden" name="FullName" value="@listEntityModels[i].FullName" />
+                                                    <input type="hidden" name="PurviewType" value="Owner" />
+                                                    <input type="hidden" name="territoryProfilesId" value="@territoryProfilesId" />
+                                                    <input type="hidden" name="OtherTerritoryId" value="" />
+                                                }
+                                            </div>
+                                            <div class="col-md-2 col-xs-2">
+                                                <div class="toggle">
+                                                    <label>
+                                                        <input type="checkbox" class="CanInsert"
+                                                               value="true"
+                                                               @(modelPur != null && modelPur.CanInsert ? "checked='checked'" : "")>
+                                                        <span class="button-indecator">新增</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-2">
+                                                <div class="toggle">
+                                                    <label class="semibold-text">
+                                                        <input type="checkbox" class="CanSelect"
+                                                               value="true"
+                                                               @(modelPur != null && modelPur.CanSelect ? "checked='checked'" : "")>
+                                                        <span class="button-indecator">查看</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-2">
+                                                <div class="toggle">
+                                                    <label class="semibold-text">
+                                                        <input type="checkbox" class="CanUpdate"
+                                                               value="true"
+                                                               @(modelPur != null && modelPur.CanUpdate ? "checked='checked'" : "")>
+                                                        <span class="button-indecator">修改</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-xs-2">
+                                                <div class="toggle">
+                                                    <label class="semibold-text">
+                                                        <input type="checkbox" class="CanDelete"
+                                                               value="true"
+                                                               @(modelPur != null && modelPur.CanDelete ? "checked='checked'" : "")>
+                                                        <span class="button-indecator">删除</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr />
+                                    }
+                                }
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (otherTerritorys != null)
+        {
+            foreach (var itemTerrId in otherTerritorys)
+            {
+                var itemTerr = businessTerritory.GetByTerrId(itemTerrId);
+                if (itemTerr != null)
+                {
+                    <div role="tabpanel" class="tab-pane" id="otherTerritoryTab@(itemTerrId)">
+                        <div class="card">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="well bs-component">
+                                        <fieldset>
+                                            <legend>小组权限配置(@(TerritoryProfilesName))-其它区域(@(itemTerr.Name):@(itemTerr.TerritoryId))</legend>
+                                            @{
+                                                for (int i = 0; i < listEntityModels.Count; i++)
+                                                {
+                                                    Purview modelPur = Model.FirstOrDefault(x => x.FullName == listEntityModels[i].FullName
+                                                    && x.PurviewType == PurviewType.OtherTerritory && x.OtherTerritoryId == itemTerrId);
+                                                    <div class="row">
+                                                        <div class="col-md-2 col-xs-2">
+                                                            @listEntityModels[i].DisplayName
+                                                            @{
+                                                                if (modelPur == null)
+                                                                {
+                                                                    <input type="hidden" name="Id" value="0" />
+                                                                    <input type="hidden" name="CreatedById" value="@currentUser.Id" />
+                                                                    <input type="hidden" name="CreatedDate" value="@DateTime.Now" />
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="hidden" name="Id" value="@modelPur.Id" />
+                                                                    <input type="hidden" name="CreatedById" value="@modelPur.CreatedById" />
+                                                                    <input type="hidden" name="CreatedDate" value="@modelPur.CreatedDate" />
+                                                                }
+                                                                <input type="hidden" name="FullName" value="@listEntityModels[i].FullName" />
+                                                                <input type="hidden" name="PurviewType" value="OtherTerritory" />
+                                                                <input type="hidden" name="TerritoryProfilesId" value="@territoryProfilesId" />
+                                                                <input type="hidden" name="OtherTerritoryId" value="@itemTerrId" />
+                                                            }
+                                                        </div>
+                                                        <div class="col-md-2 col-xs-2">
+                                                            <div class="toggle">
+                                                                <label>
+                                                                    <input type="checkbox" class="CanInsert"
+                                                                           value="true"
+                                                                           @(modelPur != null && modelPur.CanInsert ? "checked='checked'" : "")>
+                                                                    <span class="button-indecator">新增</span>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2 col-xs-2">
+                                                            <div class="toggle">
+                                                                <label class="semibold-text">
+                                                                    <input type="checkbox" class="CanSelect"
+                                                                           value="true"
+                                                                           @(modelPur != null && modelPur.CanSelect ? "checked='checked'" : "")>
+                                                                    <span class="button-indecator">查看</span>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2 col-xs-2">
+                                                            <div class="toggle">
+                                                                <label class="semibold-text">
+                                                                    <input type="checkbox" class="CanUpdate"
+                                                                           value="true"
+                                                                           @(modelPur != null && modelPur.CanUpdate ? "checked='checked'" : "")>
+                                                                    <span class="button-indecator">修改</span>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2 col-xs-2">
+                                                            <div class="toggle">
+                                                                <label class="semibold-text">
+                                                                    <input type="checkbox" class="CanDelete"
+                                                                           value="true"
+                                                                           @(modelPur != null && modelPur.CanDelete ? "checked='checked'" : "")>
+                                                                    <span class="button-indecator">删除</span>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr />
+                                                }
+                                            }
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        }
+    </div>
+
+    <div>
+        @(ButtonHelper.GetBackButton())
+        <button class="btn btn-primary btn-loading" type="button" onclick="save()">保存</button>
+    </div>
+</form>
+
+
+<div id="modalTerritoty" class="modal fade bs-example-modal-sm" role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="gridSystemModalLabel">添加区域</h4>
+            </div>
+            <div class="modal-body">
+                <select class="form-control select2" id="territoryId" name="territoryId" style="width:100%">
+                    @{
+                        if (listTerritory != null)
+                        {
+                            foreach (var itemTerritory in listTerritory)
+                            {
+                                <option value="@itemTerritory.TerritoryId" orgName="@itemTerritory.Name">@itemTerritory.NameForSelect</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="addOtherTerritory()">添加</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function save() {
+        var CanInsert = $("input[class='CanInsert']").map(function () {
+            return $(this).is(':checked');
+        }).get().join(',');
+
+        var CanSelect = $("input[class='CanSelect']").map(function () {
+            return $(this).is(':checked');
+        }).get().join(',');
+
+        var CanUpdate = $("input[class='CanUpdate']").map(function () {
+            return $(this).is(':checked');
+        }).get().join(',');
+
+        var CanDelete = $("input[class='CanDelete']").map(function () {
+            return $(this).is(':checked');
+        }).get().join(',');
+
+        $.ajax({
+            type: "POST",  //提交方式
+            url: "SetTerritoryAction",//路径
+            data: $('#setTerritoryForm').serialize() + "&CanInsert=" + CanInsert + "&CanSelect=" + CanSelect
+                + "&CanUpdate=" + CanUpdate + "&CanDelete=" + CanDelete,
+            dataType: "json",
+            traditional: true,
+            success: function (result) {//返回数据根据结果进行相应的处理
+                validAjaxResultForPC(result);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                dealErrorInfo(XMLHttpRequest);
+                resetLoadButton();
+            }
+        });
+    }
+
+
+
+    function addOtherTerritory() {
+        var territoryId = $("#territoryId option:checked").val();
+        var territoryName = $("#territoryId option:checked").attr("orgName");
+
+        if ($("#otherTerritoryTab" + territoryId + "Title")[0] != undefined) {
+            $("#otherTerritoryTab" + territoryId + "A").click();
+            $("#modalTerritoty").modal("hide");
+            return;
+        }
+
+        var tabTitle = "<li id='otherTerritoryTab" + territoryId + "Title' role='presentation' territoryIdValue='" + territoryId + "'>";
+        tabTitle += "<a href = '#otherTerritoryTab" + territoryId + "' id = 'otherTerritoryTab" + territoryId +
+            "A' aria-controls='otherTerritoryTab" + territoryId + "' role = 'tab' data-toggle='tab'> " + territoryName + "</a>";
+        tabTitle += "<i class='fa fa-close fa-sm closeTab' onclick='delOtherTerritory(this)'></i>";
+        tabTitle += "</li >";
+        $("#tabTitles").append(tabTitle);
+
+        var templetTabBody = HtmlUtil.htmlDecode("@(templet)");
+        templetTabBody = templetTabBody.replace(RegExp("__Id__", "g"), territoryId);
+        templetTabBody = templetTabBody.replace(RegExp("__Name__", "g"), territoryName);
+
+        $("#tab-content").append(templetTabBody);
+
+        $("#otherTerritoryTab" + territoryId + "A").click();
+
+        $("#modalTerritoty").modal("hide");
+
+    }
+
+    function delOtherTerritory(obj) {
+        var territoryId = $(obj).parent().attr("territoryIdValue");
+        swal({
+            title: "确认",
+            text: "确认删除" + $(obj).parent()[0].innerText+"权限？",
+            type: "info",
+            showCancelButton: true,
+            confirmButtonText: "是",
+            cancelButtonText: "否",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        }, function (isConfirm) {
+            if (isConfirm) {
+                $("#otherTerritoryTab" + territoryId + "Title").remove();
+                $("#otherTerritoryTab" + territoryId).remove();
+                $("#myTerritoryTabA").click();
+            }
+        });
+    }
+
+</script>

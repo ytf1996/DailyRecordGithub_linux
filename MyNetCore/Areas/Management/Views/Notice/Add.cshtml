@@ -1,0 +1,9 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model Notice
+
+@{
+    var htmlStr = BusinessHelper.BuildCreateOrEditPage<Notice>(Model, "6");
+}
+
+@htmlStr

@@ -1,0 +1,91 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <AssemblyName>MyNetCore</AssemblyName>
+    <RootNamespace>MyNetCore</RootNamespace>
+    <UserSecretsId>12e087a4-8656-4cad-9239-768ee0a8c897</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>5</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Areas\Management\Data\**" />
+    <Compile Remove="Areas\Management\Models\**" />
+    <Compile Remove="Areas\MyAPI\**" />
+    <Compile Remove="Log4net\**" />
+    <Content Remove="Areas\Management\Data\**" />
+    <Content Remove="Areas\Management\Models\**" />
+    <Content Remove="Areas\MyAPI\**" />
+    <Content Remove="Log4net\**" />
+    <EmbeddedResource Remove="Areas\Management\Data\**" />
+    <EmbeddedResource Remove="Areas\Management\Models\**" />
+    <EmbeddedResource Remove="Areas\MyAPI\**" />
+    <EmbeddedResource Remove="Log4net\**" />
+    <None Remove="Areas\Management\Data\**" />
+    <None Remove="Areas\Management\Models\**" />
+    <None Remove="Areas\MyAPI\**" />
+    <None Remove="Log4net\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Business\Signal\SignalRHub.cs~RF197a82b.TMP" />
+    <None Remove="Business\System\BusinessTaskModel.cs~RF1086453.TMP" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.11.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
+    <PackageReference Include="NPOI" Version="2.5.5" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.2.5" />
+    <PackageReference Include="QRCoder" Version="1.4.1" />
+    <PackageReference Include="Quartz" Version="3.3.2" />
+    <PackageReference Include="Senparc.Weixin.Work" Version="3.8.400" />
+    <PackageReference Include="Senparc.Weixin.WxOpen" Version="3.10.400" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="Areas\DailyRecord\Data\" />
+    <Folder Include="Areas\DailyRecord\Views\" />
+    <Folder Include="Areas\WeChatMini\Data\" />
+    <Folder Include="Areas\WeChatMini\Models\" />
+    <Folder Include="Areas\WeChatMini\Views\" />
+    <Folder Include="Areas\Work\Data\" />
+    <Folder Include="Areas\Work\Models\" />
+    <Folder Include="Areas\Work\Views\" />
+    <Folder Include="wwwroot\Content\attachment\" />
+    <Folder Include="wwwroot\lib\microsoft\signalr\dist\browser\" />
+  </ItemGroup>
+
+
+
+
+
+  <ItemGroup>
+    <None Update="Dockerfile">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Excel\日志导出模板.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,98 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>EmailHelper</h2>
+@using (Html.BeginForm())
+{
+    <div class="row">
+        <div class="col-md-4">
+            邮件服务器IP(EmailHost)
+        </div>
+        <div class="col-md-8">
+            <input name="EmailHost" type="text" class="form-control" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            邮件服务器端口(EmailPort)
+        </div>
+        <div class="col-md-8">
+            <input name="EmailPort" type="text" class="form-control" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            发件人邮箱地址(EmailSenderAddress)
+        </div>
+        <div class="col-md-8">
+            <input name="EmailSenderAddress" type="text" class="form-control" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            发件人邮箱密码(EmailPassword)
+        </div>
+        <div class="col-md-8">
+            <input name="EmailPassword" type="text" class="form-control" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            收件人邮箱(MessageTo)
+        </div>
+        <div class="col-md-8">
+            <input name="MessageTo" type="text" class="form-control" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            邮件标题(MessageSubject)
+        </div>
+        <div class="col-md-8">
+            <input name="MessageSubject" type="text" class="form-control" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            邮件内容(MessageBody)
+        </div>
+        <div class="col-md-8">
+            <input name="MessageBody" type="text" class="form-control" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <input type="button" value="发送邮件" class="btn btn-info form-control btn-loading" 
+                   onclick="sentEmail()"/>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    function sentEmail()
+    {
+        $.ajax({
+            type: "POST",  //提交方式
+            url: "/home/EmailHelperAction",//路径
+            data: $("form").serialize(),
+            dataType: "json",
+            success: function (result) {//返回数据根据结果进行相应的处理
+                resetLoadButton();
+                if (result.result != "success")
+                {
+                    showErrorMsg("操作失败", result.msg,0);
+                }
+                else
+                {
+                    showInfoMsg("操作成功","邮件发送成功");
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                dealErrorInfo(XMLHttpRequest);
+                resetLoadButton();
+            }
+        });
+    }
+</script>

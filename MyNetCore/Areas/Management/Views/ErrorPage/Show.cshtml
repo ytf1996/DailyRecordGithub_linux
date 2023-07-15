@@ -1,0 +1,19 @@
+﻿@using MyNetCore.Business
+@{
+    ViewBag.Title = "错误页";
+}
+
+<div class="page-title">
+    <div>
+        <h1>错误页</h1>
+        <ul class="breadcrumb side">
+            <li><a href="~/Management/Home/Index"><i class="fa fa-home fa-lg"></i></a></li>
+            <li>查看</li>
+            <li class="active">错误页</li>
+        </ul>
+    </div>
+</div>
+
+<div class="card h3">
+    @(AppContextMy.Current.Request.Query["errorStr"])
+</div>

@@ -1,0 +1,106 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model TaskModel
+
+@{
+    var htmlStr = BusinessHelper.BuildCreateOrEditPage<TaskModel>(Model, "6");
+}
+
+@htmlStr
+
+<div class="tab2Content">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div>
+                        
+                    </div>
+                    <div id="toolbar">
+                        <input id="btn-search" type="button" class="form-control btn btn-default btnForSearch" value="查询" />
+                    </div>
+                    <table id="sampleTableForTaskHistory" entity="TaskHistory" class="otherTable"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    tableColumn = [
+        {
+            title: "操作时间",
+            field: "createdDate",
+            sortable: true,
+        },
+        {
+            title: "是否成功",
+            field: "isSuccess",
+            sortable: true
+        },
+        {
+            title: "错误信息",
+            field: "errorMsg"
+        }
+    ];
+
+    //默认Name排序，订单详情model没用到Name，所以指定按照Id排序
+    defalutOrderCol = "CreatedDate";
+    defalutOrder = "desc";
+
+    $(document).ready(function () {
+
+        function checkFrequency() {
+            var value = $("#Frequency").val();
+            if (value == "Manual") {
+                $(".CycleType").hide();
+                $(".CycleTypeValue").hide();
+                $(".TimingType").hide();
+                $(".PlanRunDate").hide();
+                $(".PlanRunTime").hide();
+            }
+            else if (value == "Timing") {
+                $(".CycleType").hide();
+                $(".CycleTypeValue").hide();
+                $(".TimingType").show();
+                $(".PlanRunDate").show();
+                $(".PlanRunTime").show();
+                checkTimingType();
+            }
+            else if (value == "Cycle") {
+                $(".CycleType").show();
+                $(".CycleTypeValue").show();
+                $(".TimingType").hide();
+                $(".PlanRunDate").hide();
+                $(".PlanRunTime").hide();
+            }
+        }
+
+        checkFrequency();
+
+        $("#Frequency").change(function () {
+            checkFrequency();
+        });
+
+        function checkTimingType() {
+            var value = $("#TimingType").val();
+            if (value == "Day") {
+                $(".PlanRunDate").hide();
+            }
+            else if (value == "Month") {
+                $(".PlanRunDate").show();
+            }
+        }
+
+        checkTimingType();
+
+        $("#TimingType").change(function () {
+            checkTimingType();
+        });
+
+        showOtherTab("运行历史记录", 2, false);
+
+        initTable("sampleTableForTaskHistory", "GetListDataForTaskHistory");
+    });
+</script>

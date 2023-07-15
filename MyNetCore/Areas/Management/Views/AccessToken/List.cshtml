@@ -1,0 +1,32 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@{
+    var htmlStr = BusinessHelper.BuildListPage<AccessToken>();
+}
+@htmlStr
+
+<script>
+    tableColumn = [
+        //{
+        //    checkbox: true
+        //},
+        {
+            title: "名称",
+            field: "name",
+            sortable: true,
+            formatter: function (value, row, index) {
+                return '<a href="Edit?id=' + row.id + '">' + value + '</a>';
+            }
+        },
+        {
+            title: "用户信息",
+            field: "currentUser",
+            sortable: true,
+        },
+        {
+            title: "有效期",
+            field: "effectDateTime",
+            sortable: true,
+        }
+    ];
+</script>

@@ -1,0 +1,302 @@
+﻿@using MyNetCore.Business
+@{
+    ViewBag.Title = "用户列表";
+    var CurrentUser = new CommonBusiness().GetCurrentUserInfo();
+}
+
+
+<div class="page-title">
+    <div>
+        <h1>用户列表</h1>
+        <ul class="breadcrumb side">
+            <li><a href="~/Management/Home/Index"><i class="fa fa-home fa-lg"></i></a></li>
+            <li>管理</li>
+            <li class="active">用户</li>
+        </ul>
+    </div>
+    <div>
+        <a class="btn btn-primary btn-flat" href="Add"><i class="fa fa-lg fa-plus"></i></a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="sampleTable" entity="Users"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script charset="utf-8" src="https://map.qq.com/api/gljs?v=1.exp&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77"></script>
+
+<style type="text/css">
+    #modal-body {
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div id="container"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    关闭
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+<script>
+    tableColumn = [
+        {
+            title: "名称",
+            field: "name",
+            sortable: true,
+            formatter: function (value, row, index) {
+                return '<a href="Edit?id=' + row.id + '">' + value + '</a>';
+            }
+        },
+        {
+            title: "头像",
+            field: "code",
+            sortable: false,
+            formatter: function (value, row, index) {
+                if (!row.headImage) {
+                    return '<img class="headimg" src="/Content/images/default.png"/>';
+                }
+                return '<img class="headimg" src="' + row.headImage + '"/>';
+            }
+        },
+        {
+            title: "账号",
+            field: "code",
+            sortable: true,
+        },
+        {
+            title: "类型",
+            field: "userType",
+            sortable: true,
+        },
+        {
+            title: "顾问性质",
+            field: "counselorPropertyVal"
+        },
+        {
+            title: "签约供应商",
+            field: "contractedSupplier"
+        }, {
+            title: "职责",
+            field: "duty"
+        }, {
+            title: "组别Project team",
+            field: "group"
+        }, {
+            title: "服务单位",
+            field: "serviceUnit"
+        }, {
+            title: "人员序号",
+            field: "userOrder"
+        },
+        {
+            title: "性别",
+            field: "gender",
+            sortable: true,
+        },
+        {
+            title: "小组",
+            field: "channelId",
+            sortable: true,
+
+            sortOrder: 'desc',
+        },
+        {
+            title: "区域",
+            field: "territoryId",
+            sortable: true,
+        },
+        {
+            title: "权限",
+            field: "territoryProfilesId",
+            sortable: true,
+        },
+        {
+            title: "是否离职",
+            field: "ifLeave"
+        },
+        {
+            title: "位置",
+            field: "code",
+            sortable: false,
+            formatter: function (value, row, index) {
+                return '<button class="btn btn-primary btn-sm" onclick="showMap(' + row.id + ')">轨迹</button>';
+            }
+        },
+        {
+            title: "发送消息",
+            field: "code",
+            sortable: false,
+            formatter: function (value, row, index) {
+                return '<button class="btn btn-primary btn-sm btn-loading" onclick="sendMsg(' + row.id + ')">发送</button>';
+            }
+        }
+    ];
+
+    function addMap(latLngs) {
+
+        $("#container").html("");
+
+        if (!latLngs || latLngs.length == 0) {
+            //初始化地图
+            var map = new TMap.Map("container", {
+                //zoom: 14,
+                //center: center
+            });
+            return;
+        }
+
+        var firstLatLng;
+        var lastLatLng;
+
+        var path = [];
+
+        for (var i = 0; i < latLngs.length; i++) {
+            if (i == 0) {
+                firstLatLng = latLngs[i];
+            }
+            if (i == latLngs.length - 1) {
+                lastLatLng = latLngs[i];
+            }
+
+            path.push(new TMap.LatLng(latLngs[i].lat, latLngs[i].lng));
+        }
+
+        var center = new TMap.LatLng(firstLatLng.lat, firstLatLng.lng);
+        //初始化地图
+        var map = new TMap.Map("container", {
+            //zoom: 14,
+            center: center
+        });
+
+        var polylineLayer = new TMap.MultiPolyline({
+            map, // 绘制到目标地图
+            // 折线样式定义
+            styles: {
+                'style_blue': new TMap.PolylineStyle({
+                    'color': '#3777FF', //线填充色
+                    'width': 4, //折线宽度
+                    'borderWidth': 2, //边线宽度
+                    'borderColor': '#FFF', //边线颜色
+                    'lineCap': 'round' //线端头方式
+                })
+            },
+            geometries: [{
+                styleId: 'style_blue',
+                paths: path
+            }],
+        });
+
+        var marker = new TMap.MultiMarker({
+            map,
+            styles: {
+                'car-down': new TMap.MarkerStyle({
+                    'width': 40,
+                    'height': 40,
+                    'anchor': {
+                        x: 20,
+                        y: 20,
+                    },
+                    'faceTo': 'map',
+                    'rotate': 180,
+                    'src': '/Content/images/map/car.png',
+                }),
+                "start": new TMap.MarkerStyle({
+                    "width": 25,
+                    "height": 35,
+                    "anchor": { x: 16, y: 32 },
+                    "src": '/Content/images/map/start.png'
+                }),
+                "end": new TMap.MarkerStyle({
+                    "width": 25,
+                    "height": 35,
+                    "anchor": { x: 16, y: 32 },
+                    "src": '/Content/images/map/end.png'
+                })
+            },
+            geometries: [{
+                id: 'car',
+                styleId: 'car-down',
+                position: new TMap.LatLng(firstLatLng.lat, firstLatLng.lng),
+            }, {
+                "id": 'start',
+                "styleId": 'start',
+                "position": new TMap.LatLng(firstLatLng.lat, firstLatLng.lng)
+            }, {
+                "id": 'end',
+                "styleId": 'end',
+                "position": new TMap.LatLng(lastLatLng.lat, lastLatLng.lng)
+            }]
+        });
+        marker.moveAlong({
+            'car': {
+                path,
+                speed: 5000
+            }
+        }, {
+            autoRotation: true
+        })
+    }
+
+    function showMap(userId) {
+        $('#myModal').modal();
+        setTimeout(function () {
+            $.ajax({
+                type: "POST",  //提交方式
+                url: "GetThisMonthHistory",//路径
+                data: { id: userId },
+                dataType: "json",
+                success: function (result) {//返回数据根据结果进行相应的处理
+                    addMap(result.data);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    dealErrorInfo(XMLHttpRequest);
+                }
+            });
+        }, 500)
+    }
+
+    function sendMsg(userId) {
+        $.ajax({
+            type: "POST",  //提交方式
+            url: "SendMsg",//路径
+            data: { id: userId },
+            dataType: "json",
+            success: function (result) {//返回数据根据结果进行相应的处理
+                if (result.result == "failure") {
+                    showErrorMsg(result.msg);
+                }
+                resetLoadButton();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                dealErrorInfo(XMLHttpRequest);
+                resetLoadButton();
+            }
+        });
+    }
+
+
+</script>

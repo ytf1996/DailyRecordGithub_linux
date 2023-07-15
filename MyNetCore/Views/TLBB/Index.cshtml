@@ -1,0 +1,49 @@
+﻿@{
+    ViewData["Title"] = "自助添加点数";
+}
+
+<div class="text-center">
+    <h1 class="display-4">自助添加点数</h1>
+    <div class="row">
+        <div class="col-md-12">
+            <input id="account" type="text" class="control-label" alt="请输入需要添加点数的账号" />
+            <input id="accountBtn" type="button" class="btn btn-primary btn-loading" value="添加1000点" onclick="addPoint()" />
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function addPoint() {
+        var account = $("#account").val();
+        if (account == "" || account == null || account == undefined) {
+            showErrorMsg("错误", "请输入需要操作的账号", 0);
+            return;
+        }
+
+        $.ajax({
+            type: "POST",  //提交方式
+            url: "/TLBB/AddPoint",//路径
+            data: { account: account },
+            dataType: "json",
+            success: function (result) {//返回数据根据结果进行相应的处理
+                resetLoadButton();
+                if (result) {
+                    if (result.result == "failure") {
+                        showErrorMsg("失败", result.msg);
+                        return;
+                    }
+                    showInfoMsg("成功", "添加点数成功");
+                }
+                else {
+                    showErrorMsg("失败", "添加点数失败");
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                dealErrorInfo(XMLHttpRequest);
+                resetLoadButton();
+            }
+        });
+
+    }
+
+</script>

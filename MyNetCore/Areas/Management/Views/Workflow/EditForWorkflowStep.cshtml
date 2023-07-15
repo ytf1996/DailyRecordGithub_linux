@@ -1,0 +1,9 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model WorkflowStep
+
+@{
+    var htmlStr = BusinessHelper.BuildCreateOrEditPage<WorkflowStep>(Model, "6", true, false, "SetWorkflow?workflowId=" + Model.WorkflowId, "ajaxSaveForOther");
+}
+
+@htmlStr

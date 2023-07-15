@@ -1,0 +1,15 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model Note
+
+@{
+    var htmlStr = BusinessHelper.BuildCreateOrEditPage<Note>(Model, "6");
+}
+
+@htmlStr
+
+<style type="text/css">
+    #Remark{
+        height:300px;
+    }
+</style>

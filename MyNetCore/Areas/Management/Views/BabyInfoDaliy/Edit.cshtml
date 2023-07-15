@@ -1,0 +1,118 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model BabyInfoDaliy
+
+@{
+    var htmlStr = BusinessHelper.BuildCreateOrEditPage<BabyInfoDaliy>(Model, "6");
+}
+
+@htmlStr
+
+<div class="tab2Content">
+    <div class="card">
+        <div class="card-body">
+            <div id="toolbar">
+
+            </div>
+            <table id="sampleTableForWorkflowProgressDemo" entity="WorkflowAction"></table>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div id="container" style="height:400px">
+
+    </div>
+</div>
+
+
+<script src="~/Content/js/plugins/echarts.min.js"></script>
+
+<script type="text/javascript">
+    showOtherTab("审批记录");
+    $(document).ready(function () {
+        initTable("sampleTableForWorkflowProgressDemo", "GetListDataForWorkflowProgressDemo");
+    });
+
+    tableColumn = [
+        {
+            title: "操作日期",
+            field: "createdDate",
+            sortable: true
+        },
+        {
+            title: "操作人",
+            field: "createdBy",
+            sortable: true
+        },
+        {
+            title: "操作",
+            field: "workflowButtonName",
+            sortable: false
+        },
+        {
+            title: "备注",
+            field: "remark",
+            sortable: false
+        }
+    ];
+
+    //默认Name排序
+    defalutOrderCol = "CreatedDate";
+</script>
+
+<script>
+    function showReport() {
+        $.ajax({
+            type: "POST",  //提交方式
+            url: "GetReport1?id=@Model.Id",//路径
+            data: {},
+            dataType: "json",
+            success: function (result) {//返回数据根据结果进行相应的处理
+                var dom = document.getElementById("container");
+                var myChart = echarts.init(dom);
+                var app = {};
+                option = null;
+                option = {
+                    xAxis: {
+                        type: 'category',
+                        data: result.data.xAxisDatas
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [{
+                        data: result.data.seriesDatas,
+                        type: 'bar',
+                        showBackground: true,
+                        backgroundStyle: {
+                            color: 'rgba(220, 220, 220, 0.8)'
+                        },
+                        itemStyle: {
+                            normal: {
+                                label: {
+                                    show: true, //开启显示
+                                    position: 'top', //在上方显示
+                                    textStyle: { //数值样式
+                                        color: 'black',
+                                        fontSize: 16
+                                    }
+                                }
+                            }
+                        },
+
+                    }]
+                };
+                ;
+                if (option && typeof option === "object") {
+                    myChart.setOption(option, true);
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                
+            }
+        });
+    }
+
+    showReport();
+</script>

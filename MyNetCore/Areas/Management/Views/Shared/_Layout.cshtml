@@ -1,0 +1,480 @@
+﻿@using MyNetCore.Business
+@using MyNetCore.Models
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>@SystemSettingParam.MyConfig.WebSiteTitle</title>
+
+    @await Html.PartialAsync("_JSAndCSS")
+
+    <script type="text/javascript">
+        var tableColumn;
+        var defalutOrderCol = "UpdatedDate";
+        var defalutOrder = "desc";
+    </script>
+
+
+
+    <style>
+        .spinner {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            font-size: 10px;
+            background-color: black;
+            filter: alpha(Opacity=30);
+            /*-moz-opacity: 0.3;*/
+            opacity: 0.3;
+            z-index: 9999;
+        }
+
+            .spinner > div {
+                background-color: #00ff1c;
+                height: 20%;
+                width: 8px;
+                display: inline-block;
+                -webkit-animation: stretchdelay 1.2s infinite ease-in-out;
+                animation: stretchdelay 1.2s infinite ease-in-out;
+                margin-top: 200px;
+                opacity: 1;
+                z-index: 10000;
+            }
+
+            .spinner .rect2 {
+                -webkit-animation-delay: -1.1s;
+                animation-delay: -1.1s;
+            }
+
+            .spinner .rect3 {
+                -webkit-animation-delay: -1.0s;
+                animation-delay: -1.0s;
+            }
+
+            .spinner .rect4 {
+                -webkit-animation-delay: -0.9s;
+                animation-delay: -0.9s;
+            }
+
+            .spinner .rect5 {
+                -webkit-animation-delay: -0.8s;
+                animation-delay: -0.8s;
+            }
+
+        @@-webkit-keyframes stretchdelay {
+            0%, 40%, 100% {
+                -webkit-transform: scaleY(0.4);
+            }
+
+            20% {
+                -webkit-transform: scaleY(1.0);
+            }
+        }
+
+        @@keyframes stretchdelay {
+            0%, 40%, 100% {
+                transform: scaleY(0.4);
+                -webkit-transform: scaleY(0.4);
+            }
+
+            20% {
+                transform: scaleY(1.0);
+                -webkit-transform: scaleY(1.0);
+            }
+        }
+    </style>
+</head>
+
+@{
+    var business = new CommonBusiness();
+    MyNetCore.Models.Users currentUser = business.GetCurrentUserInfo();
+    string channelName = "未设置";
+    if (currentUser == null)
+    {
+        currentUser = new MyNetCore.Models.Users();
+    }
+    else
+    {
+        channelName = currentUser.ChannelsName;
+    }
+
+    var listEntityGroups = BusinessHelper.ListEntityModels.GroupBy(m => m.ParentMenuName).OrderBy(m => m.FirstOrDefault().OrderNum);
+}
+
+<body class="sidebar-mini fixed">
+    <div class="spinner">
+        <div class="rect1"></div>
+        <div class="rect2"></div>
+        <div class="rect3"></div>
+        <div class="rect4"></div>
+        <div class="rect5"></div>
+    </div>
+    <div class="wrapper">
+
+        <header class="main-header hidden-print">
+            <a class="logo" href="~/Management/Home/Index">@SystemSettingParam.MyConfig.WebSiteTitle</a>
+            <nav class="navbar navbar-static-top">
+                <!-- Sidebar toggle button--><a class="sidebar-toggle" href="#" data-toggle="offcanvas"></a>
+                <!-- Navbar Right Menu-->
+                <div class="navbar-custom-menu">
+                    <ul class="top-nav">
+                        <!--Notification Menu-->
+                        @*<li class="dropdown notification-menu">
+                                <a class="dropdown-toggle" href="#" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-bell-o fa-lg"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li class="not-head">You have 0 new notifications.</li>
+                                    <li>
+                                        <a class="media" href="javascript:;">
+                                            <span class="media-left media-icon"><span class="fa-stack fa-lg"><i class="fa fa-circle fa-stack-2x text-primary"></i><i class="fa fa-envelope fa-stack-1x fa-inverse"></i></span></span>
+                                            <div class="media-body"><span class="block">Lisa sent you a mail</span><span class="text-muted block">2min ago</span></div>
+                                        </a>
+                                    </li>
+                                    <li class="not-footer"><a href="#">See all notifications.</a></li>
+                                </ul>
+                            </li>*@
+                        <!-- User Menu-->
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user fa-lg"></i></a>
+                            <ul class="dropdown-menu settings-menu">
+                                <li><a href="~/Management/Home/UpdatePassword"><i class="fa fa-key fa-lg"></i> 修改密码</a></li>
+                                <li><a href="~/Account/SignOut"><i class="fa fa-sign-out fa-lg"></i> 注销</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <aside class="main-sidebar hidden-print">
+            <section class="sidebar">
+                <div class="user-panel">
+                    <div class="pull-left image">
+                        <img class="img-circle" src="@((string.IsNullOrWhiteSpace(currentUser.HeadImage))
+? "/Content/images/user.png" : currentUser.HeadImage)" alt="User Image">
+                    </div>
+                    <div class="pull-left info">
+                        <p>
+
+                            @(currentUser.Name + "(" + currentUser.Code + ")")
+                        </p>
+                        <p class="designation"style="max-width: 80%;text-overflow: ellipsis;overflow:hidden;">
+                            @(channelName)
+                        </p>
+                    </div>
+                </div>
+                <!-- Sidebar Menu-->
+                <ul id="menu_list" class="sidebar-menu">
+                    @*class="fa fa-dashboard"*@
+                    <li class="active"><a href="~/Management/Home/Index" entity="Home"><i class="fa fa-tachometer"></i><span>主页</span></a></li>
+                    @{
+                        foreach (var itemListEntity in listEntityGroups)
+                        {
+                            if (!itemListEntity.Any(x => x.IsMenu == true))
+                            {
+                                continue;
+                            }
+
+                            if (!currentUser.IsAdmin && !itemListEntity.Any(x => x.OnlyForAdmin == false && x.IsMenu == true))
+                            {
+                                continue;
+                            }
+
+                            string faIcons = string.Empty;
+                            IEnumerable<EntityModel> listEntityModelTemp = itemListEntity.Where(m => m.Icons != "" && m.Icons != null);
+
+                            if (listEntityModelTemp != null && listEntityModelTemp.Any())
+                            {
+                                faIcons = listEntityModelTemp.FirstOrDefault().Icons;
+                            }
+
+                            if (string.IsNullOrWhiteSpace(itemListEntity.Key))
+                            {
+                                foreach (var itemEntity in itemListEntity.OrderBy(m => m.OrderNum))
+                                {
+                                    if (!currentUser.IsAdmin && itemEntity.OnlyForAdmin)
+                                    {
+                                        continue;
+                                    }
+
+                                    if (!itemEntity.IsMenu)
+                                    {
+                                        continue;
+                                    }
+
+                                    <li>
+                                        <a href="~/Management/@itemEntity.Name/@itemEntity.Url" entity="@itemEntity.Name">
+                                            <i class="@faIcons"></i><span>@itemEntity.DisplayName</span>
+                                        </a>
+                                    </li>
+                                }
+
+                            }
+                            else
+                            {
+                                <li class="treeview">
+                                    @*class="fa fa-laptop"*@
+                                    <a href="#"><i class="@faIcons"></i><span>@itemListEntity.Key</span><i class="fa fa-angle-right"></i></a>
+                                    <ul class="treeview-menu">
+                                        @foreach (var itemEntity in itemListEntity.OrderBy(m => m.OrderNum))
+                                        {
+                                            if (!currentUser.IsAdmin && itemEntity.OnlyForAdmin)
+                                            {
+                                                continue;
+                                            }
+
+                                            if (!itemEntity.IsMenu)
+                                            {
+                                                continue;
+                                            }
+
+                                            <li class="treeview-submenu">
+                                                <a href="~/Management/@itemEntity.Name/@itemEntity.Url" entity="@itemEntity.Name">
+                                                    <i></i> @itemEntity.DisplayName
+                                                    @*class="fa @itemEntity.Icons"*@
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+
+                        }
+                    }
+                </ul>
+            </section>
+        </aside>
+
+        <div class="content-wrapper">
+            @RenderBody()
+        </div>
+    </div>
+</body>
+
+</html>
+
+
+<script>
+
+    function initTable(id, url) {
+        //配置参数
+        function queryParams(params) {
+            if (this.sortName == null && params.sort == null) {
+                this.sortName = defalutOrderCol;
+                this.sortOrder = defalutOrder;
+            }
+
+            var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+                pageSize: getPageSizeParam(id),   //页面大小
+                offset: params.offset,  //跳过多少条数据，从0开始
+                pageNumber: getPageNumberParam(id),//页码
+                sort: this.sortName,  //排序列名
+                sortOrder: this.sortOrder,//排位命令（desc，asc）
+                search: getSearchParam(id),
+                entityId: $("#EntityId").val(),
+                customSearch: $("#searchForm").serialize()
+            };
+            return temp;
+        }
+
+        function getPageNumberInit(id) {
+            var tag = $("#" + id).attr("entity");
+            if (!tag) {
+                tag = "comm";
+            }
+            if (sessionStorage["number_" + tag] != null && sessionStorage["number" + tag] != "") {
+                return Number(sessionStorage["number_" + tag]);
+            }
+            return 1;
+        }
+
+        function getPageNumberParam(id) {
+            if ($("#" + id).bootstrapTable("getOptions").pageNumber == null) {
+                var tag = $("#" + id).attr("entity");
+                if (!tag) {
+                    tag = "comm";
+                }
+                if (sessionStorage["number_" + tag] != null && sessionStorage["number" + tag] != "") {
+                    return Number(sessionStorage["number_" + tag]);
+                }
+                return 1;
+            }
+            else {
+                return $("#" + id).bootstrapTable("getOptions").pageNumber;
+            }
+        }
+
+        function getPageSizeInit(id) {
+            var tag = $("#" + id).attr("entity");
+            if (!tag) {
+                tag = "comm";
+            }
+            if (sessionStorage["size_" + tag] != null && sessionStorage["size_" + tag] != "") {
+                return Number(sessionStorage["size_" + tag]);
+            }
+            return 10;
+        }
+
+        function getPageSizeParam(id) {
+            if ($("#" + id).bootstrapTable("getOptions").pageSize == null) {
+                var tag = $("#" + id).attr("entity");
+                if (!tag) {
+                    tag = "comm";
+                }
+                if (sessionStorage["size_" + tag] != null && sessionStorage["size_" + tag] != "") {
+                    return Number(sessionStorage["size_" + tag]);
+                }
+                return 10;
+            }
+            else {
+                return $("#" + id).bootstrapTable("getOptions").pageSize;
+            }
+        }
+
+        function getSearchInit(id) {
+
+            if ($("#" + id).bootstrapTable("getOptions").searchText) {
+                return $("#" + id).bootstrapTable("getOptions").searchText;
+            }
+
+            return "";
+        }
+
+        function getSearchParam(id) {
+
+            if ($("#" + id).bootstrapTable("getOptions").searchText) {
+                return $("#" + id).bootstrapTable("getOptions").searchText;
+            }
+
+            return "";
+
+            var tag = $("#" + id).attr("entity");
+            if (!tag) {
+                tag = "comm";
+            }
+            if (sessionStorage["search_" + tag] != null && sessionStorage["search_" + tag] != "") {
+                return sessionStorage["search_" + tag];
+            }
+            return "";
+        }
+        
+        $("#" + id).bootstrapTable({
+            idField: "Id",  //标识哪个字段为id主键
+            contentType: "application/x-www-form-urlencoded", // 如果是post必须定义
+            method: "post",
+            url: url,
+            columns: tableColumn,
+            ajaxOptions: {},
+            pagination: true,//设置为 true 会在表格底部显示分页条
+            striped	:true,//隔行变色
+            pageNumber: getPageNumberInit(id),//如果设置了分页，首页页码
+            pageSize: getPageSizeInit(id),//如果设置了分页，页面数据条数
+            searchText: getSearchInit(id),//默认搜索内容
+            paginationLoop: false,//设置为 true 启用分页条无限循环的功能。
+            pageList: [10, 25, 50, 100],//All
+            search: true,//$("#searchForm").serialize() == "",
+            searchOnEnterKey: true, //设置为 true时，按回车触发搜索方法，否则自动触发搜索方法
+            sidePagination: "server",//表格分页的位置
+            showRefresh: false,//是否显示 刷新按钮
+            striped: true,                      //是否显示行间隔色
+            dataType: "json", // 数据类型
+            classes: 'table table-bordered', // Class样式
+            cache: true,                       //设置为 true 禁用 AJAX 数据缓存
+            pagination: true,                   //是否显示分页（*）
+            sortable: true,                     //是否启用排序
+            sortOrder: "desc",                   //排序方式
+            queryParams: queryParams, //参数
+            queryParamsType: "limit", //参数格式,发送标准的RESTFul类型的参数请求
+            showFooter: false,//是否显示列脚
+            showColumns: false,
+            cardView: true,//是否显示详细视图
+            mobileResponsive: true,//手机响应式
+            //columnsHidden:["Name"], //手机下隐藏的列
+            toolbar: "#toolbar",
+            toolbarAlign: 'right', // 工具栏对齐方式
+            onLoadSuccess: function (data) {
+                validAjaxResult(data);
+                if (data.total == 0) {
+                    $("#" + id).bootstrapTable('removeAll');
+                }
+
+                $(".btn-loading").each(function () {
+                    $(this).attr("data-loading-text", "操作中...");
+                    $(this).click(function () {
+                        $(this).button('loading');
+                    });
+                });
+                $("#btn-search").button("reset");
+            },
+            onLoadError: function (status, res) {
+                validAjaxResult(res.responseText);
+                $("#btn-search").button("reset");
+            },
+            onPageChange: function (number, size) {
+                var tag = $("#" + id).attr("entity");
+                if (!tag) {
+                    tag = "comm";
+                }
+                sessionStorage["number_" + tag] = number;
+                sessionStorage["size_" + tag] = size;
+            },
+            onSearch: function (text) {
+                //$("#resetSearch").click();
+                var tag = $("#" + id).attr("entity");
+                if (!tag) {
+                    tag = "comm";
+                }
+                sessionStorage["number_" + tag] = 1;
+                sessionStorage["search_" + tag] = text;
+            }
+        });
+
+        $("#btn-search").click(function () {
+            $("#btn-search").attr("data-loading-text", "查询中...");
+            $("#sampleTable").bootstrapTable('refresh');
+            //$('#sampleTable').bootstrapTable('selectPage', 1);
+            $(".otherTable").each(function () {
+                $("#sampleTableFor" + $(this).attr("entity")).bootstrapTable('refresh');
+            });
+        });
+
+    }
+
+    $(document).ready(function () {
+
+        //菜单动态选中 js
+        //获取当前地址栏中的链接
+        var urlstr = location.href;
+        var urlstatus = false;
+        var menu_obj = $("#menu_list a");
+        //遍历所有菜单
+        menu_obj.each(function () {
+
+            var entity = "/" + $(this).attr("entity") + "/";
+
+            //判断当前菜单是否存在
+            if ((urlstr + '/').indexOf(entity) > -1 && entity != '') {
+                $(this).parent().addClass('active');
+                $(this).parent().parent().parent().addClass('active'); //针对有多级菜单选中的样式添加
+                urlstatus = true;
+            }
+            else {
+                $(this).parent().removeClass('active');
+            }
+        });
+        //加载页面默认选中第一个
+        if (!urlstatus) {
+            //menu_obj.parent().eq(0).addClass('active');
+        }
+
+        initTable("sampleTable", "GetListData");
+    });
+
+    window.onload = function () {
+        $(".spinner").fadeOut();
+    }
+</script>

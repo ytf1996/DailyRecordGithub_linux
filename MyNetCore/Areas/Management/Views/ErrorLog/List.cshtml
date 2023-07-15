@@ -1,0 +1,60 @@
+﻿
+@{
+    ViewBag.Title = "系统日志列表";
+}
+<div class="page-title">
+    <div>
+        <h1>系统日志列表</h1>
+        <ul class="breadcrumb side">
+            <li><a href="~/Management/Home/Index"><i class="fa fa-home fa-lg"></i></a></li>
+            <li>管理</li>
+            <li class="active">系统日志</li>
+        </ul>
+    </div>
+    <div>
+        @*<a class="btn btn-primary btn-flat" href="Add"><i class="fa fa-lg fa-plus"></i></a>*@
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <table id="sampleTable" entity="ErrorLog"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    tableColumn = [
+        {
+            title: "Id",
+            field: "id",
+            sortable: true
+        },
+        {
+            title: "时间",
+            field: "logged",
+            sortable: true,
+            sortOrder: 'desc',
+        },
+        {
+            title: "Level",
+            field: "level",
+            sortable: true,
+        },
+        {
+            title: "记录",
+            field: "message",
+            sortable: true,
+        },
+        {
+            title: "详情",
+            field: "exception",
+            sortable: true,
+        }
+    ];
+
+    defalutOrderCol = "Id";
+</script>

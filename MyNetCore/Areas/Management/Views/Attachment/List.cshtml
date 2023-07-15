@@ -1,0 +1,37 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@{
+    var htmlStr = BusinessHelper.BuildListPage<Attachment>();
+}
+
+@htmlStr
+
+
+<script>
+    tableColumn = [
+        {
+            title: "图片",
+            field: "name",
+            sortable: true,
+            formatter: function (value, row, index) {
+                @*return "<img style='width:50px;height:50px;' src='@(string.Format("{0}://{1}:{2}",Request.Url.Scheme,Request.Url.Host,Request.Url.Port))" + row.Path + "' />";*@
+                return "";
+            }
+        },
+        {
+            title: "名称",
+            field: "name",
+            sortable: true,
+        },
+        {
+            title: "类型",
+            field: "contentType",
+            sortable: true,
+        },
+        {
+            title: "上传日期",
+            field: "createdDate",
+            sortable: true,
+        }
+    ];
+</script>

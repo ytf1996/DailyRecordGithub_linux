@@ -1,0 +1,186 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@{
+    string entityDisplayName = CommonBusiness.GetDisplayName<Territory>();
+    ViewBag.Title = entityDisplayName + "列表";
+    bool IsRun = MyNetCore.Business.Jobs.JobBaseService.IsRun;
+}
+<div class="page-title">
+    <div>
+        <h1>@ViewBag.Title</h1>
+        <ul class="breadcrumb side">
+            <li><a href="~/Management/Home/Index"><i class="fa fa-home fa-lg"></i></a></li>
+            <li>管理</li>
+            <li class="active">@entityDisplayName</li>
+        </ul>
+    </div>
+    <div>
+        <a class="btn btn-primary btn-flat" href="Add"><i class="fa fa-lg fa-plus"></i></a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div>
+                    @{
+                        int sencond = MyNetCore.Models.SystemSettingParam.MyConfig.JobIntervalInSeconds;
+                        if (sencond == 0)
+                        {
+                            sencond = 10;
+                        }
+                        if (IsRun)
+                        {
+                            <div id="isRunning">
+                                任务主线程(每@(sencond)秒一次)：运行中<button class="btn btn-danger btn-sm btn-loading" onclick="runMainTask(false)">关闭</button>
+                            </div>
+                            <div id="isClosing" style="display:none">
+                                任务主线程(每@(sencond)秒一次)：未运行<button class="btn btn-primary btn-sm btn-loading" onclick="runMainTask(true)">开启</button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div id="isRunning" style="display:none">
+                                任务主线程(每@(sencond)秒一次)：运行中<button class="btn btn-danger btn-sm btn-loading" onclick="runMainTask(false)">关闭</button>
+                            </div>
+                            <div id="isClosing">
+                                任务主线程(每@(sencond)秒一次)：未运行<button class="btn btn-primary btn-sm btn-loading" onclick="runMainTask(true)">开启</button>
+                            </div>
+                        }
+                    }
+                </div>
+                <div>
+                    <table id="sampleTable" entity="TaskModel"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    tableColumn = [
+        //{
+        //    checkbox: true
+        //},
+        {
+            title: "名称",
+            field: "name",
+            sortable: true,
+            formatter: function (value, row, index) {
+                return '<a href="Edit?id=' + row.id + '">' + value + '</a>';
+            }
+        },
+        {
+            title: "抽取频率",
+            field: "frequency",
+            sortable: true,
+        },
+        {
+            title: "最后运行时间",
+            field: "lastRunTime",
+            sortable: true
+        },
+        {
+            title: "下次运行时间",
+            field: "nextRunTime",
+            sortable: true
+        },
+        {
+            title: "状态",
+            field: "status",
+            sortable: true
+        },
+        {
+            title: "操作",
+            field: "name",
+            sortable: false,
+            formatter: function (value, row, index) {
+                if (row.status == "已停止") {
+                    return '<button class="btn btn-primary btn-sm btn-loading" onclick="runTask(' + row.id + ')">运行</button>';
+                } else {
+                    return '<button class="btn btn-danger btn-sm btn-loading" onclick="stopTask(' + row.id + ')">停止</button>';
+                }
+
+            }
+        }
+    ];
+
+    //开启任务
+    function runTask(id) {
+        $.ajax({
+            type: "POST",  //提交方式
+            url: "RunTaskById",//路径
+            data: { id: id },
+            dataType: "json",
+            success: function (result) {//返回数据根据结果进行相应的处理
+                resetLoadButton();
+                if (result.result != "success") {
+                    showErrorMsg(result.msg);
+                } else {
+                    $("#sampleTable").bootstrapTable('refresh');
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                dealErrorInfo(XMLHttpRequest);
+                resetLoadButton();
+            }
+        });
+    }
+
+    //停止任务
+    function stopTask(id) {
+        $.ajax({
+            type: "POST",  //提交方式
+            url: "StopTaskById",//路径
+            data: { id: id },
+            dataType: "json",
+            success: function (result) {//返回数据根据结果进行相应的处理
+                resetLoadButton();
+                if (result.result != "success") {
+                    showErrorMsg(result.msg);
+                } else {
+                    $("#sampleTable").bootstrapTable('refresh');
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                dealErrorInfo(XMLHttpRequest);
+                resetLoadButton();
+            }
+        });
+    }
+
+    //开启或关闭任务主线程
+    function runMainTask(runOrClose) {
+
+        var url = "RunTask";
+        if (runOrClose == false) {
+            url = "ShutDownTask";
+        }
+
+        $.ajax({
+            type: "POST",  //提交方式
+            url: url,//路径
+            data: {},
+            dataType: "json",
+            success: function (result) {//返回数据根据结果进行相应的处理
+                if (result.result == "success") {
+                    if (runOrClose == true) {
+                        $("#isRunning").show();
+                        $("#isClosing").hide();
+                    }
+                    else {
+                        $("#isRunning").hide();
+                        $("#isClosing").show();
+                    }
+                }
+                resetLoadButton();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                dealErrorInfo(XMLHttpRequest);
+                resetLoadButton();
+            }
+        });
+    }
+
+</script>

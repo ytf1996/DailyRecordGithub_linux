@@ -1,0 +1,141 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+
+@{
+    var rootUrl = new MyNetCore.Business.CommonBusiness().GetDomainUrl();
+}
+
+<section class="material-half-bg">
+    <div class="cover"></div>
+</section>
+<section class="login-content">
+    <div class="logo">
+        <h1>@SystemSettingParam.MyConfig.WebSiteTitle</h1>
+    </div>
+    <div class="login-box">
+        <form id="loginForm" class="login-form">
+            <h3 class="login-head"><i class="fa fa-lg fa-fw fa-user"></i>登录</h3>
+            <div class="form-group">
+                <label class="control-label">账号</label>
+                <input name="code" class="form-control required" type="text" placeholder="账号" autofocus>
+            </div>
+            <div class="form-group">
+                <label class="control-label">密  码</label>
+                <input name="password" class="form-control required" type="password" placeholder="密码">
+            </div>
+            @if (!string.IsNullOrWhiteSpace(AppContextMy.Current.Request.Query["wechatCodeBind"]))
+            {
+                <div class="form-group">
+                    <label class="control-label">微信绑定验证码(非必填)</label>
+                    <input name="wechatCodeBind" class="form-control" type="text" placeholder="微信绑定验证码(非必填)"
+                           value="@AppContextMy.Current.Request.Query["wechatCodeBind"]">
+                </div>
+            }
+
+            <div class="form-group">
+                <div class="utility">
+                    <div class="animated-checkbox">
+                        <label class="semibold-text">
+                            <input type="checkbox" name="remember"><span class="label-text">记住登录</span>
+                        </label>
+                    </div>
+                    <p class="semibold-text mb-0"><a data-toggle="flip">修改密码</a></p>
+                </div>
+            </div>
+            <div class="form-group btn-container">
+                <button id="btnLogin" class="btn btn-primary btn-block btn-loading needValid" validFor="loginForm" type="button">
+                    <i class="fa fa-sign-in fa-lg fa-fw"></i>登录
+                </button>
+            </div>
+        </form>
+
+        <form id="changePwdForm" class="forget-form">
+            <h3 class="login-head"><i class="fa fa-lg fa-fw fa-lock"></i>修改密码</h3>
+            <div class="form-group">
+                <label class="control-label">账号</label>
+                <input class="form-control required" name="myCode" type="text" placeholder="账号" autofocus>
+            </div>
+            <div class="form-group">
+                <label class="control-label">老密码</label>
+                <input class="form-control required" name="oldPassword" type="password" placeholder="老密码">
+            </div>
+            <div class="form-group">
+                <label class="control-label">新密码</label>
+                <input class="form-control required" name="newPassword" type="password" placeholder="新密码">
+            </div>
+            <div class="form-group">
+                <label class="control-label">
+                    确认密码
+                </label>
+                <input class="form-control required" name="confirmNewPassword" type="password" placeholder="确认密码">
+            </div>
+            <div class="form-group btn-container">
+                <button id="btnChangePwd" class="btn btn-primary btn-block btn-loading needValid" validFor="changePwdForm" type="button">
+                    <i class="fa fa-unlock fa-lg fa-fw"></i>修改密码
+                </button>
+            </div>
+            <div class="form-group mt-20">
+                <p class="semibold-text mb-0"><a id="aback" data-toggle="flip"><i class="fa fa-angle-left fa-fw"></i> 返回登录</a></p>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script>
+
+    $(document).ready(function () {
+        //登录
+        $("#btnLogin").click(function () {
+            $.ajax({
+                type: "POST",  //提交方式
+                url: "LoginAction",//路径
+                data: $('#loginForm').serialize() + "&historyUrl=" + "@AppContextMy.Current.Request.Query["historyUrl"]",
+                dataType: "json",
+                success: function (result) {//返回数据根据结果进行相应的处理
+                    if (result && result.result == "failure") {
+                        $("#btnLogin").button('reset');
+                        showErrorMsg("登录失败", result.msg);
+                    }
+                    else {
+                        if (result.urlRedirect) {
+                            var url = getUrl(result.urlRedirect);
+                            window.location.href = url;
+                        }
+                        else {
+                            window.location.href = "/Management/Home/Index";
+                        }
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    $("#btnLogin").button('reset');
+                    showErrorMsg("请求失败", "请联系管理员");
+                }
+            });
+        });
+
+        //修改密码
+        $("#btnChangePwd").click(function () {
+            $.ajax({
+                type: "POST",  //提交方式
+                url: "ChangePwd",//路径
+                data: $('#changePwdForm').serialize(),
+                dataType: "json",
+                success: function (result) {//返回数据根据结果进行相应的处理
+                    $("#btnChangePwd").button('reset');
+                    if (result && result.result == "failure") {
+                        showErrorMsg("修改失败", result.msg);
+                    }
+                    else {
+                        showInfoMsg("成功", "密码修改成功");
+                        $("#aback").click();
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    $("#btnChangePwd").button('reset');
+                    showErrorMsg("修改失败", "请联系管理员");
+                }
+            });
+        });
+    });
+
+</script>

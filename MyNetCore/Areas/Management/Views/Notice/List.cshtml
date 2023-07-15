@@ -1,0 +1,55 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@{
+    var htmlStr = BusinessHelper.BuildListPage<Notice>();
+}
+@htmlStr
+
+
+<script>
+    tableColumn = [
+        {
+            title: "Id",
+            field: "id",
+            sortable: true,
+            formatter: function (value, row, index) {
+                return '<a href="Edit?id=' + row.id + '">' + '查看' + '</a>';
+            }
+        },
+        {
+            title: "通知人",
+            field: "noticeMan",
+            sortable: true,
+        },
+        {
+            title: "预计通知时间",
+            field: "preSentTime",
+            sortable: true,
+        },
+        {
+            title: "是否已通知",
+            field: "isSend",
+            sortable: true,
+            sortOrder: 'desc',
+        },
+        {
+            title: "是否通知成功",
+            field: "isSendSuccess",
+            sortable: true,
+            sortOrder: 'desc',
+        },
+        {
+            title: "通知次数",
+            field: "sendCount",
+            sortable: true,
+            sortOrder: 'desc',
+        },
+        {
+            title: "实际通知时间",
+            field: "sendTime",
+            sortable: true,
+            sortOrder: 'desc',
+        }
+    ];
+
+</script>

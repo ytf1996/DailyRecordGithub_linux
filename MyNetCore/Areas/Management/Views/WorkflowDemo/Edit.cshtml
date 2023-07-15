@@ -1,0 +1,53 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model WorkflowDemo
+
+@{
+    var htmlStr = BusinessHelper.BuildCreateOrEditPage<WorkflowDemo>(Model, "6");
+}
+
+@htmlStr
+
+<div class="tab2Content">
+    <div class="card">
+        <div class="card-body">
+            <div id="toolbar">
+
+            </div>
+            <table id="sampleTableForWorkflowProgressDemo" entity="WorkflowAction"></table>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    showOtherTab("审批记录");
+    $(document).ready(function () {
+        initTable("sampleTableForWorkflowProgressDemo", "GetListDataForWorkflowProgressDemo");
+    });
+
+    tableColumn = [
+        {
+            title: "操作日期",
+            field: "createdDate",
+            sortable: true
+        },
+        {
+            title: "操作人",
+            field: "createdBy",
+            sortable: true
+        },
+        {
+            title: "操作",
+            field: "workflowButtonName",
+            sortable: false
+        },
+        {
+            title: "备注",
+            field: "remark",
+            sortable: false
+        }
+    ];
+
+    //默认Name排序
+    defalutOrderCol = "CreatedDate";
+</script>

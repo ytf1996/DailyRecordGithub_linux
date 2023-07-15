@@ -1,0 +1,45 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@{
+    var htmlStr = BusinessHelper.BuildListPage<Territory>();
+}
+
+@htmlStr
+
+<script>
+    tableColumn = [
+        //{
+        //    checkbox: true
+        //},
+        {
+            title: "名称",
+            field: "name",
+            sortable: true,
+            formatter: function (value, row, index) {
+                return '<a href="Edit?id=' + row.id + '">' + value + '</a>';
+            }
+        },
+        {
+            title: "父级",
+            field: "parentTerrId",
+            sortable: true,
+        },
+        {
+            title: "TerritoryId",
+            field: "territoryId",
+            sortable: true,
+        },
+        {
+            title: "操作",
+            field: "",
+            sortable: false,
+            formatter: function (value, row, index) {
+                return '<a href="Add?parentTerrId=' + row.territoryId + '">添加子区域</a>';
+            }
+        }
+    ];
+
+    defalutOrderCol = "territoryId";
+    defalutOrder = "asc";
+
+</script>

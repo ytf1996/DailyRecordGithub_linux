@@ -1,0 +1,79 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model Territory
+
+@{
+    var ParentTerritoryModel = new BusinessTerritory().GetByTerrId(Model.ParentTerrId);
+}
+
+<div class="page-title">
+    <div>
+        <h1><i class="fa fa-edit"></i>区域</h1>
+        <p>编辑区域</p>
+    </div>
+    <div>
+        <ul class="breadcrumb">
+            <li><a href="~/Management/Home/Index"><i class="fa fa-home fa-lg"></i></a></li>
+            <li><a href="List">区域</a></li>
+            <li class="active">编辑区域</li>
+        </ul>
+    </div>
+</div>
+
+<ul class="nav nav-tabs" role="tablist">
+    <li id="tab1Title" role="presentation" class="active">
+        <a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">详情</a>
+    </li>
+    <li id="tab2Title" role="presentation">
+        <a id="tab2A" href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">明细</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="tab1">
+        <div class="card">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="well bs-component">
+                        <form id="editForm" class="form-horizontal" method="post">
+                            <input type="hidden" value="@Model.Id" name="Id" />
+                            <input type="hidden" value="@Model.CreatedById" name="CreatedById" />
+                            <input type="hidden" value="@Model.CreatedDate" name="CreatedDate" />
+                            <input type="hidden" value="@Model.Depth" name="Depth" />
+                            <input type="hidden" value="@Model.NextRangeStart" name="NextRangeStart" />
+                            <input type="hidden" value="@Model.RangeEnd" name="RangeEnd" />
+                            <input type="hidden" value="@Model.RangeIncrement" name="RangeIncrement" />
+                            <input type="hidden" value="@Model.TerritoryId" name="TerritoryId" />
+                            <input type="hidden" value="@Model.TheOrder" name="TheOrder" />
+                            <fieldset>
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="ParentTerrId">上级</label>
+                                        <select class="form-control required select2" id="ParentTerrId" name="ParentTerrId">
+                                            @if (ParentTerritoryModel != null)
+                                            {
+                                                <option value="@ParentTerritoryModel.TerritoryId">@ParentTerritoryModel.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="Name">名称</label>
+                                        <input class="form-control required" id="Name" name="Name" type="text" placeholder="名称" value="@Model.Name">
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        @(ButtonHelper.GetBackButton())
+                                        @(ButtonHelper.GetDeleteButton<Territory>(Model))
+                                        @(ButtonHelper.GetSaveButtonForEdit<Territory>(Model))
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

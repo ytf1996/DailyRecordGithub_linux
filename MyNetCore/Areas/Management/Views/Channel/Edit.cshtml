@@ -1,0 +1,9 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model Channel
+
+@{
+    var htmlStr = BusinessHelper.BuildCreateOrEditPage<Channel>(Model, "6", true);
+}
+
+@htmlStr

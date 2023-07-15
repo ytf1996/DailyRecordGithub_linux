@@ -1,0 +1,62 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model TaskModel
+
+@{
+    var htmlStr = BusinessHelper.BuildCreateOrEditPage<TaskModel>(Model, "6");
+}
+
+@htmlStr
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        function checkFrequency() {
+            var value = $("#Frequency").val();
+            if (value == "Manual") {
+                $(".CycleType").hide();
+                $(".CycleTypeValue").hide();
+                $(".TimingType").hide();
+                $(".PlanRunDate").hide();
+                $(".PlanRunTime").hide();
+            }
+            else if (value == "Timing") {
+                $(".CycleType").hide();
+                $(".CycleTypeValue").hide();
+                $(".TimingType").show();
+                $(".PlanRunDate").show();
+                $(".PlanRunTime").show();
+                checkTimingType();
+            }
+            else if (value == "Cycle") {
+                $(".CycleType").show();
+                $(".CycleTypeValue").show();
+                $(".TimingType").hide();
+                $(".PlanRunDate").hide();
+                $(".PlanRunTime").hide();
+            }
+        }
+
+        checkFrequency();
+
+        $("#Frequency").change(function () {
+            checkFrequency();
+        });
+
+        function checkTimingType() {
+            var value = $("#TimingType").val();
+            if (value == "Day") {
+                $(".PlanRunDate").hide();
+            }
+            else if (value == "Month") {
+                $(".PlanRunDate").show();
+            }
+        }
+
+        checkTimingType();
+
+        $("#TimingType").change(function () {
+            checkTimingType();
+        });
+    });
+</script>

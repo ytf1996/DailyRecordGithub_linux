@@ -1,0 +1,46 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@{
+    var htmlStr = BusinessHelper.BuildListPage<LatLngHistory>();
+}
+@htmlStr
+
+
+<script>
+    tableColumn = [
+        //{
+        //    checkbox: true
+        //},
+        //{
+        //    title: "名称",
+        //    field: "name",
+        //    sortable: true,
+        //    formatter: function (value, row, index) {
+        //        return '<a href="Edit?id=' + row.id + '">' + value + '</a>';
+        //    }
+        //},
+        {
+            title: "创建时间",
+            field: "createdDate",
+            sortable: true,
+        },
+        {
+            title: "创建者",
+            field: "createdBy",
+            sortable: true,
+        },
+        {
+            title: "经度",
+            field: "lng",
+            sortable: true,
+        },
+        {
+            title: "维度",
+            field: "lat",
+            sortable: true,
+        }
+    ];
+
+    defalutOrderCol = "CreatedDate";
+
+</script>

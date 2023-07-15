@@ -1,0 +1,28 @@
+﻿@using MyNetCore.Business
+<div id="loginForm">
+
+</div>
+<script>
+    $.ajax({
+        type: "POST",  //提交方式
+        url: "LoginForMPWechatAction?wechatId=@AppContextMy.Current.Request.Query["wechatId"]",//路径
+        dataType: "json",
+    success: function (result) {//返回数据根据结果进行相应的处理
+        if (result && result.result == "failure") {
+            showErrorMsg("登录失败", result.msg);
+        }
+        else {
+            if (result.urlRedirect) {
+                var url = getUrl(result.urlRedirect);
+                window.location.href = url;
+            }
+            else {
+                window.location.href = "/Management/Home/Index";
+            }
+        }
+    },
+    error: function (XMLHttpRequest, textStatus, errorThrown) {
+        showErrorMsg("请求失败", "请联系管理员");
+    }
+    });
+</script>

@@ -1,0 +1,28 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@{
+    var htmlStr = BusinessHelper.BuildListPage<Channel>();
+}
+@htmlStr
+
+
+<script>
+    tableColumn = [
+        //{
+        //    checkbox: true
+        //},
+        {
+            title: "名称",
+            field: "name",
+            sortable: true,
+            formatter: function (value, row, index) {
+                return '<a href="Edit?id=' + row.id + '">' + value + '</a>';
+            }
+        },
+        {
+            title: "顺序",
+            field: "orderNum",
+            sortable: true,
+        }
+    ];
+</script>

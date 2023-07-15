@@ -1,0 +1,82 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model Workflow
+
+@{
+    var ListWorkflowEntityModels = BusinessHelper.ListWorkflowEntityModels;
+    string AddOrEditStr = Model == null || Model.Id == 0 ? "添加" : "修改";
+    string FormIdName = Model == null || Model.Id == 0 ? "addForm" : "editForm";
+}
+
+<div class="page-title">
+    <div>
+        <h1><i class="fa fa-edit"></i>工作流</h1>
+        <p>@(AddOrEditStr)工作流</p>
+    </div>
+    <div>
+        <ul class="breadcrumb">
+            <li><a href="/Management/Home/Index"><i class="fa fa-home fa-lg"></i></a></li>
+            <li><a href="List">工作流</a></li>
+            <li class="active">@(AddOrEditStr)工作流</li>
+        </ul>
+    </div>
+</div>
+<ul class="nav nav-tabs" role="tablist">
+    <li id="tab1Title" role="presentation" class="active"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">详情</a></li>
+</ul>
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="tab1">
+        <div class="card">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="well bs-component">
+                        <form id="@(FormIdName)" class="form-horizontal" method="post">
+                            <input type="hidden" value="@Model.Id" name="Id" />
+                            <input type="hidden" value="@Model.CreatedById" name="CreatedById" />
+                            <input type="hidden" value="@Model.CreatedDate" name="CreatedDate" />
+                            <input type="hidden" value="@Model.Deleted" name="Deleted" />
+                            <fieldset>
+                                <legend></legend>
+                                <div class="form-group">
+                                    <div class="col-md-6">
+                                        <label id="lbl_Name" class="control-label" for="Name">*名称</label>
+                                        <input class="form-control required" id="Name" name="Name" type="text" placeholder="*名称" value="@Model.Name" />
+                                    </div>
+                                    <input type="hidden" name="TerritoryId" value="" />
+                                    <div class="col-md-6">
+                                        <label id="lbl_WorkflowEntityName" class="control-label" for="WorkflowEntityName">*实体名称</label>
+                                        <select class="form-control select2 required" id="WorkflowEntityName" name="WorkflowEntityName" placeholder="*实体名称">
+                                            @if (ListWorkflowEntityModels != null)
+                                            {
+                                                foreach (var itemWorkflowEntityModel in ListWorkflowEntityModels)
+                                                {
+                                                    if (Model.WorkflowEntityName == itemWorkflowEntityModel.FullName)
+                                                    {
+                                                        <option selected="selected" value="@itemWorkflowEntityModel.FullName">
+                                                            @itemWorkflowEntityModel.DisplayName
+                                                        </option>
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label id="lbl_Remark" class="control-label" for="Remark">备注</label>
+                                        <input class="form-control" id="Remark" name="Remark" type="text" placeholder="备注" value="@Model.Remark" />
+                                    </div>
+                                    <div class="col-md-12">
+                                        <br />
+                                        @(ButtonHelper.GetBackButton())
+                                        @(ButtonHelper.GetSaveButtonForEdit<Workflow>(Model))
+                                        @(ButtonHelper.GetDeleteButton<Workflow>(Model))
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

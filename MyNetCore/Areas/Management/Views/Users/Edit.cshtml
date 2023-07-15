@@ -1,0 +1,271 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model Users
+
+@{
+    var ListTerritory = BusinessHelper.ListTerritoryForSelect;
+    var ListTerritoryProfiles = BusinessHelper.ListTerritoryProfiles;
+    var ListChannel = new BusinessChannel().GetListByIds(Model.ChannelIds);
+    var CurrentUser = new CommonBusiness().GetCurrentUserInfo();
+    Users ModelLineManager = null;
+    if (Model.LineManageId.HasValue && Model.LineManageId.Value > 0)
+    {
+        ModelLineManager = new BusinessUsers().GetById(Model.LineManageId.Value, false);
+    }
+}
+
+<div class="page-title">
+    <div>
+        <h1><i class="fa fa-edit"></i>用户</h1>
+        <p>编辑用户</p>
+    </div>
+    <div>
+        <ul class="breadcrumb">
+            <li><a href="~/Management/Home/Index"><i class="fa fa-home fa-lg"></i></a></li>
+            <li><a href="List">用户</a></li>
+            <li class="active">编辑用户</li>
+        </ul>
+    </div>
+</div>
+
+<ul class="nav nav-tabs" role="tablist">
+    <li id="tab1Title" role="presentation" class="active">
+        <a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">详情</a>
+    </li>
+    <li id="tab2Title" role="presentation">
+        <a id="tab2A" href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">明细</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="tab1">
+        <div class="card">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="well bs-component">
+                        <form id="editForm" class="form-horizontal" method="post">
+                            <input type="hidden" value="@Model.Id" name="Id" />
+                            <input type="hidden" value="@Model.CreatedById" name="CreatedById" />
+                            <input type="hidden" value="@Model.CreatedDate" name="CreatedDate" />
+                            <input type="hidden" value="@Model.Deleted" name="Deleted" />
+                            <input type="hidden" value="@Model.LastLogin" name="LastLogin" />
+                            <input type="hidden" value="@Model.HeadImage" name="HeadImage" />
+                            <fieldset>
+                                <legend></legend>
+
+                                <div class="form-group">
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="Code">*账号</label>
+                                        <input class="form-control required" id="Code" name="Code" type="text" readonly="readonly" placeholder="账号"
+                                               value="@Model.Code">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="PassWord">密码</label>
+                                        <input class="form-control password" id="PassWord" readonly="readonly" name="PassWord" type="password" placeholder="密码" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="Name">*名称</label>
+                                        <input class="form-control required" id="Name" name="Name" type="text" placeholder="名称" value="@Model.Name"
+                                               autocomplete="off" />
+                                        <input type="hidden">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="Email">邮箱</label>
+                                        <input class="form-control" id="Email" name="Email" type="text" placeholder="邮箱" value="@Model.Email">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="PhoneNum">手机号</label>
+                                        <input class="form-control" id="PhoneNum" name="PhoneNum" type="text" placeholder="手机号" value="@Model.PhoneNum" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="WeChatCorpId">公众号用户身份编码</label>
+                                        <input class="form-control" id="WeChatCorpId" name="WeChatCorpId" type="text"
+                                               placeholder="公众号用户身份编码" value="@Model.WeChatCorpId">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="WeChatUserId">企业号员工账号</label>
+                                        <input class="form-control" id="WeChatUserId" name="WeChatUserId" type="text" placeholder="企业号员工账号"
+                                               value="@Model.WeChatUserId">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="WeChatOpenidForMiniProgram">小程序用户身份编码</label>
+                                        <input class="form-control" id="WeChatOpenidForMiniProgram" name="WeChatOpenidForMiniProgram" type="text"
+                                               placeholder="小程序用户身份编码" value="@Model.WeChatOpenidForMiniProgram" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="WeChatUnionId">开放平台用户身份编码</label>
+                                        <input class="form-control" id="WeChatUnionId" name="WeChatUnionId" type="text" placeholder="开放平台用户身份编码"
+                                               value="@Model.WeChatUnionId" />
+                                    </div>
+
+
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="TerritoryId">*区域</label>
+                                        <select class="form-control select2 required" id="TerritoryId" name="TerritoryId">
+                                            @{
+                                                if (ListTerritory != null)
+                                                {
+                                                    foreach (var itemTerritory in ListTerritory)
+                                                    {
+                                                        <option @(Model.TerritoryId == itemTerritory.TerritoryId ? "selected='selected'" : "") value="@itemTerritory.TerritoryId">@itemTerritory.Name</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="TerritoryProfilesId">*权限配置文件</label>
+                                        <select class="form-control select2 required" id="TerritoryProfilesId" name="TerritoryProfilesId">
+                                            @{
+                                                if (ListTerritoryProfiles != null)
+                                                {
+                                                    foreach (var itemTerritoryProfiles in ListTerritoryProfiles)
+                                                    {
+                                                        <option @(Model.TerritoryProfilesId == itemTerritoryProfiles.Id ? "selected='selected'" : "") value="@itemTerritoryProfiles.Id">@itemTerritoryProfiles.Name</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="UserType">*类型</label>
+                                        <select class="form-control required select2" id="UserType" name="UserType">
+                                            <option value="Normal" @(Model.UserType == UserType.Normal ? "selected='selected'" : "")>普通用户</option>
+                                            <option value="WeChatWork" @(Model.UserType == UserType.WeChatWork ? "selected='selected'" : "")>微信企业号用户</option>
+                                            <option value="WeChatMP" @(Model.UserType == UserType.WeChatMP ? "selected='selected'" : "")>微信服务号用户</option>
+                                            <option value="WeChatMini" @(Model.UserType == UserType.WeChatMini ? "selected='selected'" : "")>微信小程序用户</option>
+                                            <option value="Admin" @(Model.UserType == UserType.Admin ? "selected='selected'" : "")>系统管理员</option>
+                                        </select>
+                                    </div>
+
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="CounselorPropertyVal">顾问性质</label>
+                                        <select class="form-control select2" id="CounselorPropertyVal" name="CounselorPropertyVal">
+                                            <option value="">/</option>
+                                            <option value="DevelopmentEngineer" @(Model.CounselorPropertyVal == CounselorProperty.DevelopmentEngineer ? "selected='selected'" : "")>实施</option>
+                                            <option value="TestEngineer" @(Model.CounselorPropertyVal == CounselorProperty.TestEngineer ? "selected='selected'" : "")>实施</option>
+                                            <option value="ImplementationEngineer" @(Model.CounselorPropertyVal == CounselorProperty.ImplementationEngineer ? "selected='selected'" : "")>实施</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="ContractedSupplier">签约供应商</label>
+                                        <input class="form-control" id="ContractedSupplier" name="ContractedSupplier" type="text" placeholder="签约供应商" value="@Model.ContractedSupplier"
+                                               autocomplete="off" />
+                                        <input type="hidden">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="Duty">职责</label>
+                                        <input class="form-control" id="Duty" name="Duty" type="text" placeholder="职责" value="@Model.Duty"
+                                               autocomplete="off" />
+                                        <input type="hidden">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="Group">组别Project team</label>
+                                        <input class="form-control" id="Group" name="Group" type="text" placeholder="组别Project team" value="@Model.Group"
+                                               autocomplete="off" />
+                                        <input type="hidden">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="ServiceUnit">服务单位</label>
+                                        <input class="form-control" id="ServiceUnit" name="ServiceUnit" type="text" placeholder="服务单位" value="@Model.ServiceUnit"
+                                               autocomplete="off" />
+                                        <input type="hidden">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="UserOrder">人员序号</label>
+                                        <input class="form-control" id="UserOrder" name="UserOrder" type="text" placeholder="人员序号" value="@Model.UserOrder"
+                                               autocomplete="off" />
+                                        <input type="hidden">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="IfLeave">是否离职</label>
+                                        <select class="form-control select2" id="IfLeave" name="IfLeave">
+                                            <option value=1 @(Model.IfLeave == 1? "selected='selected'" : "")>否</option>
+                                            <option value=0 @(Model.IfLeave == 0? "selected='selected'" : "")>是</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="UserType">直属上级<a onclick="delLineManager()">删除</a></label>
+                                        <select class="form-control select2" id="LineManageId" name="LineManageId" selectEntityName="Users">
+                                            @if (ModelLineManager != null)
+                                            {
+                                                <option value="@ModelLineManager.Id" selected="selected">@ModelLineManager.Name</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="ChannelIds">*小组</label>
+                                        <select class="form-control select2 required" id="ChannelIds" name="ChannelIds" multiple="multiple" selectEntityName="Channel">
+                                            @{
+                                                if (ListChannel != null)
+                                                {
+                                                    foreach (var itemChannel in ListChannel)
+                                                    {
+                                                        <option selected="selected" value="@itemChannel.Id">@itemChannel.Name</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="Gender">*性别</label>
+                                        <select class="form-control required select2" id="Gender" name="Gender">
+                                            <option value="Male" @(Model.Gender == Gender.Male ? "selected='selected'" : "")>男</option>
+                                            <option value="FeMale" @(Model.Gender == Gender.FeMale ? "selected='selected'" : "")>女</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label id="lbl_Disabled" class="control-label" for="Disabled">是否禁用</label>
+                                        <div class="toggle-flip">
+                                            <label id="lbl_Disabled">
+                                                <input type="checkbox" value="true" name="Disabled" id="Disabled" @(Model.Disabled ? "checked=\"checked\"" : "")>
+                                                <span class="flip-indecator" data-toggle-on="是" data-toggle-off="否"></span>
+                                            </label>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <br />
+                                        @(ButtonHelper.GetBackButton())
+                                        @(ButtonHelper.GetDeleteButtonNoRight<Users>(Model))
+                                        @(ButtonHelper.GetSaveButtonForEditNoRight<Users>(Model))
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function delLineManager() {
+        $("#LineManageId").val("");
+        $("#LineManageId").select2();
+    }
+</script>

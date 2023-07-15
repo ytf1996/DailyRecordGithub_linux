@@ -1,0 +1,49 @@
+﻿@using MyNetCore.Models
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>@SystemSettingParam.MyConfig.WebSiteTitle</title>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries-->
+    <!--if lt IE 9
+    script(src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js')
+    script(src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js')
+    -->
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="~/Content/css/main.css">
+    <!-- Font-icon css-->
+    <link rel="stylesheet" type="text/css" href="~/Content/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/css/mycss.css" />
+    <!-- JS -->
+    <script type="text/javascript" src="~/Content/js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="~/Content/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Content/js/main.js"></script>
+    <!-- 提示信息控件 -->
+    <script type="text/javascript" src="~/Content/js/plugins/bootstrap-notify.min.js"></script>
+    <!-- 美化提示框控件 -->
+    <script type="text/javascript" src="~/Content/js/plugins/sweetalert.min.js"></script>
+    <!-- 手机端日期控件 -->
+    <script type="text/javascript" src="~/Content/js/plugins/mobiscroll/mobiscroll.javascript.min.js"></script>
+
+    <script type="text/javascript" src="~/Content/js/myjs.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                @RenderBody()
+            </div>
+            <div class="col-xs-12">
+                <br />
+                @Html.ValidationSummary()
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+

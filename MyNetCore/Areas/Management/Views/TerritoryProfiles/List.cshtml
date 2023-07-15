@@ -1,0 +1,41 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@{
+    var htmlStr = BusinessHelper.BuildListPage<TerritoryProfiles>();
+}
+@htmlStr
+
+
+<script>
+    tableColumn = [
+        //{
+        //    checkbox: true
+        //},
+        {
+            title: "名称",
+            field: "name",
+            sortable: true,
+            formatter: function (value, row, index) {
+                return '<a href="Edit?id=' + row.id + '">' + value + '</a>';
+            }
+        },
+        {
+            title: "区域",
+            field: "territoryId",
+            sortable: true,
+        },
+        {
+            title: "创建时间",
+            field: "createdDate",
+            sortable: true,
+        },
+        {
+            title: "操作",
+            field: "",
+            sortable: false,
+            formatter: function (value, row, index) {
+                return '<a href="../Purview/SetTerritory?territoryProfilesId=' + row.id + '">分配权限</a>';
+            }
+        }
+    ];
+</script>

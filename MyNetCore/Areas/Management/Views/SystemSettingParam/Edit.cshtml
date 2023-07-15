@@ -1,0 +1,68 @@
+﻿<div>
+    @using MyNetCore.Models
+    @using MyNetCore.Business
+    @model SystemSettingParam
+
+    @{
+        var htmlStr = BusinessHelper.BuildCreateOrEditPage<SystemSettingParam>(Model);
+    }
+
+    @(htmlStr)
+
+    <div class="tab2Content">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="control-label" for="ResetIIS">重启IIS</label>
+                        <div>
+                            <button id="ResetIIS" class="btn btn-danger btn-loading control-label" name="ResetIIS"
+                                    onclick="resetIIS()">
+                                重启IIS
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+
+        function resetIIS() {
+            $("#ResetIIS").button('loading');
+            swal({
+                title: "确定?",
+                text: "此操作将会重启网站!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonText: "是",
+                cancelButtonText: "否",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "ResetIIS",
+                        type: "post",
+                        dataType: "JSON",
+                        success: function (result) {
+                            window.setTimeout(function () { showInfoMsg("成功", "启动成功"); window.location.reload(); }, 5000);
+                        }, error: function (XMLHttpRequest, errorInfo, errorObj) {
+                            resetLoadButton();
+                            showErrorMsg("重启失败", errorInfo);
+                        }
+                    })
+
+                } else {
+                    resetLoadButton();
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            showOtherTab("其它");
+        });
+    </script>
+</div>

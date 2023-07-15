@@ -1,0 +1,167 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model WorkflowButton
+
+@{
+    List<Users> selectedUsers = new BusinessUsers().GetListByIds(Model.UserIds);
+    List<Channel> selectedChannel = new BusinessChannel().GetListByIds(Model.ChannelIds);
+}
+
+<div class="page-title">
+    <div>
+        <h1><i class="fa fa-edit"></i>工作流按钮</h1>
+        <p>修改工作流按钮</p>
+    </div>
+    <div>
+        <ul class="breadcrumb">
+            <li><a href="/Management/Home/Index"><i class="fa fa-home fa-lg"></i></a></li>
+            <li><a href="List">工作流按钮</a></li>
+            <li class="active">修改工作流按钮</li>
+        </ul>
+    </div>
+</div>
+<ul class="nav nav-tabs" role="tablist">
+    <li id="tab1Title" role="presentation" class="active"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">详情</a></li>
+    <li id="tab2Title" role="presentation"><a id="tab2A" href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">明细</a></li>
+</ul>
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="tab1">
+        <div class="card">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="well bs-component">
+                        <form id="editForm" class="form-horizontal" method="post">
+                            <input type="hidden" name="entityId" id="EntityId" value="@Model.Id" />
+                            <fieldset>
+                                <div class="form-group">
+                                    <input type="hidden" name="WorkflowId" value="@Model.WorkflowId" />
+                                    <input type="hidden" name="LastWorkflowStepId" value="@Model.LastWorkflowStepId" />
+                                    <input type="hidden" name="NextWorkflowStepId" value="@Model.NextWorkflowStepId" />
+                                    <input type="hidden" name="Id" value="@Model.Id" />
+                                    <input type="hidden" name="CreatedById" value="@Model.CreatedById" />
+                                    <input type="hidden" name="CreatedDate" value="@Model.CreatedDate" />
+                                    <input type="hidden" name="UpdatedById" value="@Model.UpdatedById" />
+                                    <input type="hidden" name="UpdatedDate" value="@Model.UpdatedDate" />
+                                    <input type="hidden" name="Deleted" value="@Model.Deleted" />
+                                    <input type="hidden" name="TerritoryId" value="" />
+                                    <div class="col-md-6">
+                                        <label id="lbl_Name" class="control-label" for="Name">*名称</label>
+                                        <input class="form-control required" id="Name" name="Name" type="text" placeholder="*名称" value="@Model.Name" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label id="lbl_OrderNum" class="control-label" for="OrderNum">顺序</label>
+                                        <input class="form-control " id="OrderNum" name="OrderNum" type="number" placeholder="顺序" value="@Model.OrderNum" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label id="lbl_OnlyViewForCreatedBy" class="control-label" for="OnlyViewForCreatedBy">申请人可见</label>
+                                        <div class="toggle-flip">
+                                            <label id="lbl_OnlyViewForCreatedBy"><input type="checkbox" value="true" @(Model.OnlyViewForCreatedBy ? "checked='checked'" : "") name="OnlyViewForCreatedBy" id="OnlyViewForCreatedBy" /><span class="flip-indecator" data-toggle-on="是" data-toggle-off="否"></span></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label id="lbl_OnlyViewForLineManager" class="control-label" for="OnlyViewForLineManager">上级可见</label>
+                                        <div class="toggle-flip">
+                                            <label id="lbl_OnlyViewForLineManager"><input type="checkbox" value="true" @(Model.OnlyViewForLineManager ? "checked='checked'" : "") name="OnlyViewForLineManager" id="OnlyViewForLineManager" /><span class="flip-indecator" data-toggle-on="是" data-toggle-off="否"></span></label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label id="lbl_ChannelIds" class="control-label" for="ChannelIds">小组可见</label>
+                                        <select class="form-control select2" id="ChannelIds" name="ChannelIds" placeholder="小组可见" multiple="multiple" selectEntityName="Channel">
+                                            @if (selectedChannel != null)
+                                            {
+                                                foreach (var item in selectedChannel)
+                                                {
+                                                    <option selected="selected" value="@item.Id">@item.Name</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label id="lbl_UserIds" class="control-label" for="UserIds">人员可见</label>
+                                        <select class="form-control select2" id="UserIds" name="UserIds" placeholder="人员可见" multiple="multiple" selectEntityName="Users">
+                                            @if (selectedUsers != null)
+                                            {
+                                                foreach (var item in selectedUsers)
+                                                {
+                                                    <option selected="selected" value="@item.Id">@item.Name</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label id="lbl_CanViewCondition" class="control-label" for="CanViewCondition">按钮可见条件(此处写from语句后面的sql,可用@id置换当前记录的id)</label>
+                                        <textarea class="form-control " id="CanViewCondition" name="CanViewCondition" type="text"
+                                                  placeholder="此处写from语句后面的sql,可用@id置换当前记录的id">@Model.CanViewCondition</textarea>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <br />
+                                        <a class="btn btn-default btn-loading" href="SetWorkflow?workflowId=@Model.WorkflowId" type="button">返回</a>&nbsp;
+                                        <button class="btn btn-danger btn-loading btn-delete ajaxSaveForOther" type="button" validfor="deleteForm" actionname="WorkflowButton">删除</button>&nbsp;
+                                        <button class="btn btn-primary btn-loading needValid btn-edit ajaxSaveForOther" validfor="editForm" type="button" actionname="WorkflowButton">保存</button>&nbsp;
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="tab2"></div>
+</div>
+
+<div class="tab2Content">
+    <div class="card">
+        <div class="card-body">
+            <div id="toolbar">
+                <a class="btn btn-primary btn-flat" href="AddForWorkflowAction?workflowButtonId=@Model.Id"><i class="fa fa-lg fa-plus"></i></a>
+            </div>
+            <table id="sampleTableForWorkflowAction" entity="WorkflowAction"></table>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    showOtherTab("事件");
+    $(document).ready(function () {
+        initTable("sampleTableForWorkflowAction", "GetListDataForWorkflowAction");
+    });
+
+    tableColumn = [
+        {
+            title: "事件类型",
+            field: "workflowActionType",
+            sortable: true,
+            formatter: function (value, row, index) {
+                return '<a href="EditForWorkflowAction?id=' + row.id + '">' + value + '</a>';
+            }
+        },
+        {
+            title: "运行顺序",
+            field: "orderNum",
+            sortable: true
+        },
+        {
+            title: "修改字段名",
+            field: "editColumnName",
+            sortable: true,
+            formatter: function (value, row, index) {
+                if (row.WorkflowActionType == "修改字段值") {
+                    return value;
+                }
+                return "-";
+            }
+        },
+        {
+            title: "修改字段值",
+            field: "editColumnValue",
+            sortable: true
+        }
+    ];
+
+    //默认Name排序，订单详情model没用到Name，所以指定按照Id排序
+    defalutOrderCol = "OrderNum";
+    defalutOrder = "asc";
+</script>

@@ -1,0 +1,9 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model ChatRoom
+
+@{
+    var htmlStr = BusinessHelper.BuildCreateOrEditPage<ChatRoom>(Model, "6");
+}
+
+@htmlStr

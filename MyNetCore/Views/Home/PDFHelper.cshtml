@@ -1,0 +1,137 @@
+﻿
+<style>
+    .btn {
+        width: 100%;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <a href="http://118.25.35.119/Home/PDFHelper">速度慢(切换线路)</a>
+    </div>
+</div>
+@using (Html.BeginForm())
+{
+    <div class="row" id="filesRow">
+        <div class="col-md-12">
+            <input type="hidden" id="mergeFilePath" />
+            <label class="control-label">上传PDF文件</label>
+            <div class="input-group">
+                <input class="form-control files" name="file" type="file" accept="application/pdf">
+                <span class="input-group-btn"><button class="btn btn-danger btn-add-file" type="button"><i class="fa fa-plus"></i></button></span>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-12">
+            <input id="btn-submit" type="button" class="btn btn-info btn-loading" value="上传并合并" />
+        </div>
+        <div class="col-md-12 download">
+            <input id="btn-submit" type="button" class="btn btn-success btn-download" value="下载" />
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+    $(".btn-add-file").click(function () {
+        var htmlStr = "<div class=\"input-group\"><input name=\"file\" class=\"form-control files\" type=\"file\" accept=\"application/pdf\"><span class=\"input-group-btn\"><button class=\"btn btn-danger btn-remove-file\" type=\"button\"><i class=\"fa fa-minus\"></i></button></span></div>";
+        $("#filesRow").find(".col-md-12").append(htmlStr);
+        $(".btn-remove-file").click(function () {
+            $(this).parent().parent().remove();
+        });
+    });
+
+    $(".download").hide();
+
+    $("#btn-submit").click(function () {
+        $(".download").hide();
+        var formData = new FormData();
+        var fileTypeIsCorrect = true;
+        $(".files").each(function () {
+            if ($(this)[0].files && $(this)[0].files[0]) {
+                if ($(this)[0].files[0].type != "application/pdf") {
+                    fileTypeIsCorrect = false;
+                    return;
+                }
+                formData.append($(this)[0].files[0].name, $(this)[0].files[0]);
+            }
+        });
+
+        if (fileTypeIsCorrect == false) {
+            showErrorMsg("操作失败", "选择的文件类型不正确");
+            window.setTimeout(function () { resetLoadButton(); }, 1000);
+            return;
+        }
+
+        if (formData.forEach.length == 0) {
+            showErrorMsg("操作失败", "请先选择要合并的文件");
+            window.setTimeout(function () { resetLoadButton(); }, 1000);
+            return;
+        }
+
+        formData.append("mergeFilePath", $("#mergeFilePath").val());
+
+        $.ajax({
+            url: "PDFMerge",
+            type: "POST",
+            data: formData,
+            contentType: false,//必须false才会自动加上正确的Content-Type
+            processData: false,//必须false才会避开jQuery对 formdata 的默认处理.XMLHttpRequest会对 formdata 进行正确的处理.
+            success: function (result) {
+                resetLoadButton();
+                if (result) {
+                    if (result.result == "failure") {
+                        showErrorMsg("操作失败", result.msg);
+                        return;
+                    }
+                    $("#mergeFilePath").val(result.data.outMergeFile);
+                    if (result.msg && result.msg != "") {
+                        showInfoMsg("合并成功", result.msg, 0);
+                        $(".download").show();
+                    }
+                    if (result.data.outMergeFile && result.data.outMergeFile != "") {
+                        downloadFile(getRootPath() + result.data.outMergeFile);
+                    }
+                }
+                else {
+                    showErrorMsg("操作失败", "服务器未响应");
+                    return;
+                }
+            },
+            error: function (result) {
+                resetLoadButton();
+            }
+        });
+
+    });
+
+    function downloadFile(url) {
+        window.open(url);
+    }
+
+    $(".btn-download").click(function () {
+        var fileUrl = $("#mergeFilePath").val();
+        if (fileUrl != "") {
+            downloadFile(getRootPath() + fileUrl);
+        }
+    });
+
+    //判断是否是微信浏览器的函数
+    function isWeiXin() {
+        //window.navigator.userAgent属性包含了浏览器类型、版本、操作系统类型、浏览器引擎类型等信息，这个属性可以用来判断浏览器类型
+        var ua = window.navigator.userAgent.toLowerCase();
+        //通过正则表达式匹配ua中是否含有MicroMessenger字符串
+        if (ua.match(/MicroMessenger/i) == 'micromessenger') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    if(isWeiXin())
+    {
+        showErrorMsg("注意", "微信中无法操作，请在浏览器中打开，建议在电脑端浏览器中操作",0);
+    }
+
+</script>

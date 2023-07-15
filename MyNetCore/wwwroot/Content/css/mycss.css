@@ -1,0 +1,122 @@
+﻿body {
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+li .active {
+    background-color: #888888;
+}
+
+.treeview-submenu a:hover {
+    background-color: #9f9f9f;
+}
+
+.treeview-menu .fa {
+    position: relative;
+    width: 20px;
+}
+
+.customError {
+    height: 80%;
+    overflow: auto;
+    word-break: break-word;
+}
+
+
+@media (max-width: 768px) {
+    .customError {
+        margin-top: -50% !important;
+        height: 80%;
+        overflow: auto;
+        word-break: break-word;
+        top: 30%;
+    }
+}
+
+.headimg {
+    width: 30px;
+    height: 30px;
+}
+
+textarea {
+    height: 120px;
+}
+
+.report {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 400px;
+    padding: 0px;
+    margin: 0px;
+    border-width: 0px;
+    cursor: default;
+}
+
+#tab2Title {
+    display: none;
+}
+
+#tab3Title {
+    display: none;
+}
+
+#tab4Title {
+    display: none;
+}
+
+#tab5Title {
+    display: none;
+}
+
+.col-md-1 .select2 {
+    width: 100%!important;
+}
+
+.col-md-2 .select2 {
+    width: 100%!important;
+}
+
+.col-md-3 .select2 {
+    width: 100%!important;
+}
+
+.col-md-4 .select2 {
+    width: 100%!important;
+}
+
+.col-md-5 .select2 {
+    width: 100%!important;
+}
+
+.col-md-6 .select2 {
+    width: 100%!important;
+}
+
+.col-md-7 .select2 {
+    width: 100%!important;
+}
+
+.col-md-8 .select2 {
+    width: 100%!important;
+}
+
+.col-md-9 .select2 {
+    width: 100%!important;
+}
+
+.col-md-10 .select2 {
+    width: 100%!important;
+}
+
+.col-md-11 .select2 {
+    width: 100%!important;
+}
+
+.col-md-12 .select2 {
+    width: 100%!important;
+}
+
+#Remark {
+    height: 300px;
+}

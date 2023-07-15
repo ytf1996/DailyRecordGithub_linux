@@ -1,0 +1,10 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model EmailSettingParam
+
+
+@{
+    var htmlStr = BusinessHelper.BuildCreateOrEditPage<EmailSettingParam>(Model);
+}
+
+@htmlStr

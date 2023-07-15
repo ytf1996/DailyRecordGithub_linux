@@ -1,0 +1,38 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@{
+    var htmlStr = BusinessHelper.BuildListPage<BabyInfo>();
+}
+@htmlStr
+
+
+<script>
+    tableColumn = [
+        //{
+        //    checkbox: true
+        //},
+        {
+            title: "名称",
+            field: "name",
+            sortable: true,
+            formatter: function (value, row, index) {
+                return '<a href="Edit?id=' + row.id + '">' + value + '</a>';
+            }
+        },
+        {
+            title: "性别",
+            field: "sex",
+            sortable: true,
+        },
+        {
+            title: "出生时间",
+            field: "timeOfBirth",
+            sortable: true,
+        },
+        {
+            title: "出生重量",
+            field: "birthWeight",
+            sortable: true,
+        }
+    ];
+</script>

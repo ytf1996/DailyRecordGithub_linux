@@ -1,0 +1,33 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@{
+    var htmlStr = BusinessHelper.BuildListPage<WorkflowDemo>();
+}
+@htmlStr
+
+
+<script>
+    tableColumn = [
+        //{
+        //    checkbox: true
+        //},
+        {
+            title: "名称",
+            field: "name",
+            sortable: true,
+            formatter: function (value, row, index) {
+                return '<a href="Edit?id=' + row.id + '">' + value + '</a>';
+            }
+        },
+        {
+            title: "工作流状态",
+            field: "workflowStatus",
+            sortable: true,
+        },
+        {
+            title: "当前操作人",
+            field: "shenPiRen",
+            sortable: false,
+        }
+    ];
+</script>

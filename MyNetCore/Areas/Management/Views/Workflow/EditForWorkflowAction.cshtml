@@ -1,0 +1,196 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@model WorkflowAction
+
+@{
+    List<SelectListItem> listWorkflowActionType = Roim.Common.EnumHelperEx.GetSelectList(typeof(WorkflowActionType));
+    List<SelectModel> listSelectModel = BusinessHelper.GetDBColumnsByClassFullName(Model.Workflow.WorkflowEntityName);
+    List<Users> selectedUsers = new BusinessUsers().GetListByIds(Model.NoticeUserIds);
+    List<Channel> selectedChannel = new BusinessChannel().GetListByIds(Model.NoticeChannelIds);
+}
+
+<div class="page-title">
+    <div>
+        <h1>
+            <i class="fa fa-edit"></i>工作流按钮事件
+        </h1>
+        <p>修改工作流按钮事件</p>
+    </div>
+    <div>
+        <ul class="breadcrumb">
+            <li>
+                <a href="/Management/Home/Index">
+                    <i class="fa fa-home fa-lg"></i>
+                </a>
+            </li>
+            <li>
+                <a href="List">工作流按钮事件</a>
+            </li>
+            <li class="active">修改工作流按钮事件</li>
+        </ul>
+    </div>
+</div>
+<ul class="nav nav-tabs" role="tablist">
+    <li id="tab1Title" role="presentation" class="active">
+        <a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab">详情</a>
+    </li>
+    <li id="tab2Title" role="presentation">
+        <a id="tab2A" href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab">明细</a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="tab1">
+        <div class="card">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="well bs-component">
+                        <form id="editForm" class="form-horizontal" method="post">
+                            <input type="hidden" name="entityId" id="EntityId" value="@Model.Id" />
+                            <fieldset>
+                                <legend></legend>
+                                <div class="form-group">
+                                    <input type="hidden" name="WorkflowId" value="@Model.WorkflowId" />
+                                    <input type="hidden" name="WorkflowButtonId" value="@Model.WorkflowButtonId" />
+                                    <input type="hidden" name="Id" value="@Model.Id" />
+                                    <input type="hidden" name="CreatedById" value="@Model.CreatedById" />
+                                    <input type="hidden" name="CreatedDate" value="@Model.CreatedDate" />
+                                    <input type="hidden" name="UpdatedById" value="@Model.UpdatedById" />
+                                    <input type="hidden" name="UpdatedDate" value="@Model.UpdatedDate" />
+                                    <input type="hidden" name="Deleted" value="@Model.Deleted" />
+                                    <input type="hidden" name="Name" value="@Model.Name" />
+                                    <input type="hidden" name="TerritoryId" value="@Model.TerritoryId" />
+                                    <div class="col-md-6">
+                                        <label id="lbl_WorkflowActionType" class="control-label" for="WorkflowActionType">事件类型</label>
+                                        <select class="form-control  select2" id="WorkflowActionType" name="WorkflowActionType" placeholder="事件类型"
+                                                onchange="showActionTypeSet()">
+                                            @{
+                                                if (listWorkflowActionType != null)
+                                                {
+                                                    foreach (var item in listWorkflowActionType)
+                                                    {
+                                                        <option value="@item.Value" @((Model.WorkflowActionType).ToString() == item.Value ? "selected='selected'" : "")>@item.Text</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 actionTypeSet runsql">
+                                        <label id="lbl_RunSqlText" class="control-label" for="RunSqlText">运行SQL语句</label>
+                                        <input class="form-control " id="RunSqlText" name="RunSqlText" type="text" placeholder="运行SQL语句" value="@Model.RunSqlText" />
+                                    </div>
+                                    <div class="col-md-6 actionTypeSet editcolumnvalue">
+                                        <label id="lbl_EditColumnName" class="control-label" for="EditColumnName">修改字段名</label>
+                                        <select class="form-control select2" id="EditColumnName" name="EditColumnName" placeholder="修改字段名">
+                                            @{
+                                                if (listSelectModel != null)
+                                                {
+                                                    foreach (var item in listSelectModel)
+                                                    {
+                                                        <option @(item.SelectStringValue == Model.EditColumnName ? "selected='selected'" : "") value="@item.SelectStringValue">@(string.Format("{0}({1})", item.SelectText, item.SelectStringValue))</option>
+                                                    }
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 actionTypeSet editcolumnvalue">
+                                        <label id="lbl_EditColumnValue" class="control-label" for="EditColumnValue">修改字段值</label>
+                                        <input class="form-control " id="EditColumnValue" name="EditColumnValue" type="text" placeholder="修改字段值" value="@Model.EditColumnValue" />
+                                    </div>
+                                    <div class="col-md-6 actionTypeSet noticeway">
+                                        <label id="lbl_NoticeLineManager" class="control-label" for="NoticeLineManager">是否通知上级</label>
+                                        <div class="toggle-flip">
+                                            <label id="lbl_NoticeLineManager"><input type="checkbox" value="true" @(Model.NoticeLineManager ? "checked='checked'" : "") name="NoticeLineManager" id="NoticeLineManager" /><span class="flip-indecator" data-toggle-on="是" data-toggle-off="否"></span></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 actionTypeSet noticeway">
+                                        <label id="lbl_NoticeChannelIds" class="control-label" for="NoticeChannelIds">通知小组</label>
+                                        <select class="form-control select2" id="NoticeChannelIds" name="NoticeChannelIds" placeholder="通知小组" multiple="multiple" selectEntityName="Channel">
+                                            @if (selectedChannel != null)
+                                            {
+                                                foreach (var item in selectedChannel)
+                                                {
+                                                    <option selected="selected" value="@item.Id">@item.Name</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 actionTypeSet noticeway">
+                                        <label id="lbl_NoticeUserIds" class="control-label" for="NoticeUserIds">通知人员</label>
+                                        <select class="form-control select2" id="NoticeUserIds" name="NoticeUserIds" placeholder="通知人员" multiple="multiple" selectEntityName="Users">
+                                            @if (selectedUsers != null)
+                                            {
+                                                foreach (var item in selectedUsers)
+                                                {
+                                                    <option selected="selected" value="@item.Id">@item.Name</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6 actionTypeSet noticeway">
+                                        <label id="lbl_NoticeContent" class="control-label" for="NoticeContent">通知文本</label>
+                                        <input class="form-control " id="NoticeContent" name="NoticeContent" type="text" placeholder="通知文本" value="@Model.NoticeContent" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label id="lbl_OrderNum" class="control-label" for="OrderNum">运行顺序</label>
+                                        <input class="form-control " id="OrderNum" name="OrderNum" type="number" placeholder="运行顺序" value="@Model.OrderNum" />
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <br />
+                                        <button class="btn btn-default btn-loading btn-back" type="button">返回</button>&nbsp;
+                                        <button class="btn btn-danger btn-loading btn-delete ajaxSaveForOther" type="button" validfor="deleteForm" actionname="WorkflowAction">删除</button>&nbsp;
+                                        <button class="btn btn-primary btn-loading needValid btn-edit ajaxSaveForOther" validFor="editForm" type="button" actionName="WorkflowAction">保存</button>&nbsp;
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="tab2"></div>
+</div>
+
+<div class="tab2Content">
+    <div class="card">
+        <div class="card-body">
+            <pre>说明：
+一、修改字段值
+1、工作流状态(WorkflowStatus):
+0:新建
+10:进行中
+20:完成
+30:退回
+二、运行Sql语句
+1、可以用@id做占位符代替当前记录的id值</pre>
+        </div>
+    </div>
+</div>
+
+<script>
+    showOtherTab("说明", 2, false);
+    function showActionTypeSet() {
+        var t = $("#WorkflowActionType").val();
+        $(".actionTypeSet").hide();
+        switch (t) {
+            case "EditColumnValue":
+                $(".editcolumnvalue").show();
+                break;
+            case "WeChatNotice":
+                $(".noticeway").show();
+                break;
+            case "EmailNotice":
+                $(".noticeway").show();
+                break;
+            case "RunSql":
+                $(".runsql").show();
+                break;
+            default:
+                break;
+        }
+    }
+    showActionTypeSet();
+</script>

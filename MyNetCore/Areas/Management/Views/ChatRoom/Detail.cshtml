@@ -1,0 +1,178 @@
+﻿@using MyNetCore.Models
+@using MyNetCore.Business
+@{
+    var currentUser = new BusinessChatRoom().GetCurrentUserInfo();
+    var currentUserCode = currentUser?.Code;
+    string recordId = ViewBag.RecordId;
+    var recordName = ViewBag.RecordName;
+    var usersInRoom = MyNetCore.Business.Signal.SignalRHub.ChatRoomInfos.Where(m => m.RoomId == recordId);
+}
+
+<style>
+    .info {
+        max-width: 85%;
+        word-wrap: break-word;
+    }
+
+    #usersInfo {
+        max-height: 545px;
+        min-height: 545px;
+        overflow: scroll;
+    }
+
+    .userLi {
+        line-height: 40px;
+        list-style: none;
+    }
+
+    .text-overflow {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <h3 class="card-title">@recordName</h3>
+            <div class="messanger">
+                <div id="messages" class="messages">
+                </div>
+                <div class="sender">
+                    <input type="text" id="messageInput" placeholder="Send Message" onkeydown="onTextareaKeyDown()">
+                    <button id="sendButton" value="Send" class="btn btn-primary" type="button"><i class="fa fa-lg fa-fw fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div id="usersInfo" class="card">
+            <ul id="userList">
+                @{
+                    foreach (var item in usersInRoom)
+                    {
+                        <li id="@(item.UserCode)" class="userLi text-overflow"><img class="headimg img-circle" src="@(item.UserHeadImg)" />&nbsp;&nbsp;@(item.UserName)</li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/Content/js/plugins/signalr/signalr.js"></script>
+
+<script>
+    //发送文本框按下键盘事件
+    function onTextareaKeyDown() {
+        if (event.keyCode == 13) { //如果按的是enter键 13是enter
+            event.preventDefault(); //禁止默认事件（默认是换行）
+            $("#sendButton").click(); //执行发送动作
+        }
+    }
+
+    var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+
+        var recordId = "@recordId";
+        var currentUserCode = "@currentUserCode";
+
+        //这个可以不一致
+        connection.on("toall_" + recordId, function (userName, userCode, headImage, message, type) {
+            if (type == "userSpeak") {
+                if (currentUserCode == userCode) {
+                    $("#messages").append('<div class="message me"><img class="headimg" src = "' + headImage + '" ><p class="info">' + userName + "：<br/>" + message + '</p></div>');
+                } else {
+                    $("#messages").append('<div class="message"><img class="headimg" src = "' + headImage + '" ><p class="info">' + userName + "：<br/>" + message + '</p></div>');
+                }
+                var showContent = $("#messages");
+                showContent[0].scrollTop = showContent[0].scrollHeight;
+            } else if (type == "userCome") {
+                var obj = JSON.parse(message);
+                if (obj && obj.UserCode) {
+                    $("#userList").append("<li id=" + obj.UserCode + " class='userLi text-overflow'>" + "<img class='headimg img-circle' src='" + obj.UserHeadImg + "'/>&nbsp;&nbsp;" + obj.UserName + "</li>");
+                }
+            } else if (type == "userGo") {
+                $("#" + message).remove();
+            }
+        });
+
+    connection.start().then(function () {
+        //和服务器必须一致
+        connection.invoke("sendall", currentUserCode, recordId, "userCome").catch(function (err) {
+            return console.info(err.toString());
+        });
+
+        }).catch(function (err) {
+            return console.info(err.toString());
+        });
+
+        document.getElementById("sendButton").addEventListener("click", function (event) {
+            var message = $("#messageInput").val();
+            if (message == "") {
+                $("#sendButton").attr("disabled", "disabled");
+                return;
+            }
+
+            //和服务器必须一致
+            connection.invoke("sendall", message, recordId,"userSpeak").catch(function (err) {
+                return console.info(err.toString());
+            });
+            event.preventDefault();
+            $("#messageInput").val("");
+            $("#sendButton").attr("disabled", "disabled");
+        });
+
+        $("#sendButton").attr("disabled", "disabled");
+
+        //检验需要验证的控件验证都通过
+        $("#messageInput").bind('input propertychange change', function () {
+            if ($("#messageInput").val() == "") {
+                $("#sendButton").attr("disabled", "disabled");
+            } else {
+                $("#sendButton").removeAttr("disabled");
+            }
+        });
+
+
+    var _isIOS = -1;
+    var _isAndroid = -1;
+    const ua = window.navigator.userAgent.toLocaleLowerCase();
+
+    function isIOS() {
+        if (_isIOS === -1) {
+            _isIOS = /iPhone|iPod|iPad/i.test(ua) ? 1 : 0;
+        }
+        return _isIOS === 1;
+    }
+
+    function isAndroid() {
+        if (_isAndroid === -1) {
+            _isAndroid = /Android/i.test(ua) ? 1 : 0;
+        }
+        return _isAndroid === 1;
+    }
+    if (isAndroid()) {
+        const innerHeight = window.innerHeight;
+        window.addEventListener('resize', () => {
+            const newInnerHeight = window.innerHeight;
+            if (innerHeight > newInnerHeight) {
+                
+            } else {
+                // 键盘收起事件处理
+                setTimeout(() => {
+                    window.scrollTo(0, 0);
+                }, 100);
+            }
+        });
+    } else if (isIOS()) {
+        window.addEventListener('focusin', () => {// 键盘弹出事件处理
+        });
+        window.addEventListener('focusout', () => { // 键盘收起事件处理
+            
+            window.scroll(0, 0)
+        });
+    }
+
+
+
+</script>
